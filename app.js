@@ -52,7 +52,7 @@ var DIRECT_MESSAGES = [
 ];
 
 // 処理の繰り返し間隔
-var INTERVAL = 0.5 * 60 * 1000; //15分
+var INTERVAL = 15 * 60 * 1000; //15分
 
 // データベースの初期設定
 for (var key in schema){
