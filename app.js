@@ -47,7 +47,7 @@ var DIRECT_MESSAGES = [
   },
   {
     step: RP4_CAME,
-    message: ""
+    message: "５だんかいめだよ　５だんかいめだよ"
   }
 ];
 
