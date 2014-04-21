@@ -85,8 +85,10 @@ setInterval(function(){
             if(err) console.log(err);
             else console.log("step" + step + " DM done :" + reply);
           });
-          follower.step++;
-          follower.save(function(err){ if(err) console.log(err); });
+          if(follower.step == RP4_CAME || follower.step == RP3_CAME || follower.step == RP2_CAME || follower.step == RP1_CAME || follower.step == FOLLOW_CAME){
+            follower.step++;
+            follower.save(function(err){ if(err) console.log(err); });
+          }
           mesNum++;
         });
       }
