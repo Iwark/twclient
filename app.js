@@ -25,7 +25,7 @@ var RP4_CAME = 9;     // DMに対する４度目の返信を検知した段階
 var DM5_SENT = 10;     // ５段階目のDMを送信した状態
 
 // 15分間に送信するメッセージの最大数
-var MAX_NUM_OF_DM = 2;
+var MAX_NUM_OF_DM = 10;
 
 // ステップごとに送信するDMの内容
 var DIRECT_MESSAGES = [
