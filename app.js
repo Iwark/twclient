@@ -87,6 +87,7 @@ setInterval(function(){
           });
           if(follower.step == RP4_CAME || follower.step == RP3_CAME || follower.step == RP2_CAME || follower.step == RP1_CAME || follower.step == FOLLOW_CAME){
             follower.step++;
+            follower.last_sent_at = new Date();
             follower.save(function(err){ if(err) console.log(err); });
           }
           mesNum++;
@@ -113,11 +114,12 @@ setInterval(function(){
               if(!err && follower){
                 if(follower.step == DM1_SENT || follower.step == DM2_SENT || follower.step == DM3_SENT || follower.step == DM4_SENT){
                   if(follower.last_sent_at){
-                    var lastDate = new Date(follower.last_sent_at);
-                    if(directMessage["created_at"] - lastDate <= 10) return;
+                    var lastDate = follower.last_sent_at;
+                    var createdDate = new Date(directMessage["created_at"]);
+                    if(createdDate - lastDate <= 10) return;
                   }
                   follower.step++;
-                  follower.last_sent_at = directMessage["created_at"];
+                  follower.last_sent_at = new Date(directMessage["created_at"]);
                   follower.save(function(err){ if(err) console.log(err); callback(); });
                 }else callback();
               }else{
