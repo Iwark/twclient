@@ -4,12 +4,21 @@ var schema = require('./schema.js');
 var async = require('async');
 
 // 使用するTwitterアカウントと、その設定項目
-var SCREEN_NAME = 'sayakarzmrumgx'
+// var SCREEN_NAME = 'sayakarzmrumgx'
+// var T = new Twit({
+//     consumer_key:         'y9MH162TvhljOcLdlG9m4mkbc'
+//   , consumer_secret:      'epMyUD0bdPXTnB8YsCEvM287BVr26rrMIDHYMHIMWtMFM3fSIZ'
+//   , access_token:         '2454429072-z4ieC1hnsjd5JVm5ss2X9Ly8YwJV5Y2BnGYRckD'
+//   , access_token_secret:  'eiQI8iSkWb2i5Ds2htyQWVJx2Ostw37eb3gq8wWfUfrdD'
+// });
+
+// 使用するTwitterアカウントと、その設定項目
+var SCREEN_NAME = 'maaamin4'
 var T = new Twit({
-    consumer_key:         'y9MH162TvhljOcLdlG9m4mkbc'
-  , consumer_secret:      'epMyUD0bdPXTnB8YsCEvM287BVr26rrMIDHYMHIMWtMFM3fSIZ'
-  , access_token:         '2454429072-z4ieC1hnsjd5JVm5ss2X9Ly8YwJV5Y2BnGYRckD'
-  , access_token_secret:  'eiQI8iSkWb2i5Ds2htyQWVJx2Ostw37eb3gq8wWfUfrdD'
+    consumer_key:         'Afhyk2nTSaJvfiwXp0pd50E6C'
+  , consumer_secret:      'Dy7r1UQML24Xsy7vhsO9Eu5fj3y6qnMPQNAPQHYjVe3BjaxkvS'
+  , access_token:         '2368012110-KiAn5hkBZrQGYE587kQxL6DRLtybHN0jPUtHHdK'
+  , access_token_secret:  'x1hBZc7nEnIi4y5Uta6LLWumYdPYL0ESlZbh3OnCGbXmi'
 });
 
 // ステップ定数（段階）
