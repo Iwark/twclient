@@ -11,8 +11,6 @@ var async = require('async');
 //   , access_token:         '2454429072-z4ieC1hnsjd5JVm5ss2X9Ly8YwJV5Y2BnGYRckD'
 //   , access_token_secret:  'eiQI8iSkWb2i5Ds2htyQWVJx2Ostw37eb3gq8wWfUfrdD'
 // });
-
-// 使用するTwitterアカウントと、その設定項目
 var SCREEN_NAME = 'maaamin4'
 var T = new Twit({
     consumer_key:         'Afhyk2nTSaJvfiwXp0pd50E6C'
@@ -31,7 +29,8 @@ var DM3_SENT = 6;     // ３段階目のDMを送信した状態
 var RP3_CAME = 7;     // DMに対する３度目の返信を検知した段階
 var DM4_SENT = 8;     // ４段階目のDMを送信した状態
 var RP4_CAME = 9;     // DMに対する４度目の返信を検知した段階
-var DM5_SENT = 10;     // ５段階目のDMを送信した状態
+var DM5_SENT = 10;    // ５段階目のDMを送信した状態
+var ALREADY  = 99;    // 最初からフレンド状態
 
 // 15分間に送信するメッセージの最大数
 var MAX_NUM_OF_DM = 10;
@@ -56,7 +55,7 @@ var DIRECT_MESSAGES = [
   },
   {
     step: RP4_CAME,
-    message: "５だんかいめだよ　５だんかいめだよ"
+    message: "LINEしよーよ*(^o^)* http://line.naver.jp/ti/p/ThI-12pukm"
   }
 ];
 
@@ -71,6 +70,53 @@ var Follower = mongoose.model('Follower');
 mongoose.connect('mongodb://localhost/twclient');
 
 var lastSentDirectMessageID;
+
+// サーバー起動時、フレンド全員のステップを99（終了状態）にしておく。
+// リフォローの検出
+async.waterfall([
+  // フレンドリストの取得
+  function(callback){
+    T.get('friends/ids', { screen_name: SCREEN_NAME }, function(err, reply){
+      var friends = [];
+      if(!err) friends = reply["ids"];
+      console.log("got friend_list.");
+      callback(err, friends);
+    });
+  },
+  // フレンドリストに存在するフォロワーの取得
+  function(friends, callback){
+    T.get('followers/ids', { screen_name: SCREEN_NAME },  function (err, reply) {
+      var followers = [];
+      if(!err) followers = reply["ids"].filter(function(follower_id){
+        for(var i=0; i<friends.length; i++){
+          if(parseInt(follower_id) == parseInt(friends[i])) return true;
+        }
+        return false;
+      });
+      console.log("got follower_list.");
+      callback(err, followers);
+    });
+  },
+  // データベースに存在していなければ作成
+  function(followers, callback){
+    async.each(followers, function(follower_id, a_callback){
+      Follower.findOne({ follower_id: follower_id },function(err, follower){
+        if(!err && !follower){
+          //データベースに存在していない場合
+          var newFollower = new Follower({ follower_id: follower_id, step: ALREADY });
+          newFollower.save(function(err){
+            if(err) console.log(err);
+            a_callback();
+          });
+        }
+      });
+    });
+    callback(null, 'done');
+  }
+], function(err,result){
+  if(err) console.log(err);
+  console.log('series all done. ' + result);
+});
 
 setInterval(function(){
 
