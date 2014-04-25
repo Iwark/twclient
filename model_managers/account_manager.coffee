@@ -1,9 +1,10 @@
 Twit = require "twit"
 
 class AccountManager
-  screen_name: 
 
-  constructor:
+  constructor: (account) ->
+    @screen_name = account.name
+    @T = new Twit account
 
   # フレンドリストの取得
   getFriends: (callback) ->
@@ -15,3 +16,4 @@ class AccountManager
       callback err, friends
       return
 
+module.exports = AccountManager
