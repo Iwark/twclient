@@ -8,6 +8,7 @@
   "dependencies": {
     "mongoose": "*",
     "twit": "*",
-    "async": "*"
+    "async": "*",
+    "js-yaml": "*"
   }
 }

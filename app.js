@@ -3,6 +3,8 @@ var mongoose = require('mongoose');
 var schema = require('./schema.js');
 var async = require('async');
 
+var config = require('./config.js');
+
 // 使用するTwitterアカウントと、その設定項目
 // var SCREEN_NAME = 'sayakarzmrumgx'
 // var T = new Twit({
