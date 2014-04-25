@@ -3,17 +3,15 @@ mongoose = require "mongoose"
 fs = require "fs"
 async = require "async"
 yaml = require "js-yaml"
-schema = require "./schema.js"
-config = require "./config.js"
 
-accounts = yaml.load(fs.readFileSync('./config/accounts.yml','utf-8'))
+schema = require "./db/schema.js"
+
+accounts = yaml.load(fs.readFileSync('./config/account_list.yml','utf-8'))
 messages = yaml.load(fs.readFileSync('./config/messages.yml','utf-8'))
 steps    = yaml.load(fs.readFileSync('./config/steps.yml','utf-8'))
 
-AccountManager = require "./model_managers/account_manager"
-accountManager = new AccountManager(accounts[0])
-
-stepCodes =
+Account = require "./models/account"
+account = new Account(accounts[0])
 
 # 15分間に送信するメッセージの最大数
 MAX_NUM_OF_DM = 10
@@ -32,30 +30,18 @@ lastSentDirectMessageID = undefined
 # リフォローの検出
 async.waterfall [
 
-  # フレンドリストの取得
-  (callback) -> accountManager.getFriends callback
+  # フォローリストの取得
+  (callback) -> account.getFollowList callback
 
-  # フレンドリストに存在するフォロワーの取得
-  (friends, callback) ->
-    T.get "followers/ids",
-      screen_name: SCREEN_NAME
-    , (err, reply) ->
-      followers = []
-      unless err
-        followers = reply["ids"].filter((follower_id) ->
-          i = 0
-
-          while i < friends.length
-            return true  if parseInt(follower_id) is parseInt(friends[i])
-            i++
-          false
-        )
-      callback err, followers
-      return
+  # フォロワーリストの取得
+  (callback) -> account.getFollowerList callback
+    
+  # フレンド（相互フォロー）の取得
+  (callback) -> account.getFriends callback
 
   # データベースに存在していなければ作成
-  (followers, callback) ->
-    async.each followers, (follower_id, a_callback) ->
+  (callback) ->
+    async.each account.friends, (follower_id, a_callback) ->
       Follower.findOne
         follower_id: follower_id
       , (err, follower) ->
@@ -63,32 +49,24 @@ async.waterfall [
           #データベースに存在していない場合
           newFollower = new Follower(
             follower_id: follower_id
-            step: ALREADY
+            step: steps.finished
           )
-          newFollower.save (err) ->
-            console.log err  if err
-            a_callback()
-            return
-
+          newFollower.save (err) -> a_callback()
         return
-
       return
-
     callback null, "done"
 ], (err, result) ->
   console.log err  if err
-  console.log "series all done. " + result
+  console.log "marked friends as finished: " + result
   return
 
 setInterval (->
   # 送信待ちの段階にあるフォロワーへのDM送信
   mesNum = 0
   async.each [
-    RP4_CAME
-    RP3_CAME
-    RP2_CAME
-    RP1_CAME
-    FOLLOW_CAME
+    steps.dm4_replyed, steps.dm3_replyed
+    steps.dm2_replyed, steps.dm1_replyed
+    steps.followed
   ], (step, callback) ->
     Follower.find
       step: step
@@ -181,39 +159,18 @@ setInterval (->
   # リフォローの検出
   async.waterfall [
 
-    # フレンドリストの取得
-    (callback) ->
-      T.get "friends/ids",
-        screen_name: SCREEN_NAME
-      , (err, reply) ->
-        friends = []
-        friends = reply["ids"]  unless err
-        console.log "got friend_list."
-        callback err, friends
-        return
+    # フォローリストの取得
+    (callback) -> account.getFollowList callback
 
-    # フレンドリストに存在するフォロワーの取得
-    (friends, callback) ->
-      T.get "followers/ids",
-        screen_name: SCREEN_NAME
-      , (err, reply) ->
-        followers = []
-        unless err
-          followers = reply["ids"].filter((follower_id) ->
-            i = 0
-
-            while i < friends.length
-              return true  if parseInt(follower_id) is parseInt(friends[i])
-              i++
-            false
-          )
-        console.log "got follower_list."
-        callback err, followers
-        return
+    # フォロワーリストの取得
+    (callback) -> account.getFollowerList callback
+      
+    # フレンド（相互フォロー）の取得
+    (callback) -> account.getFriends callback
 
     # データベースに存在していなければ作成
-    (followers, callback) ->
-      async.each followers, (follower_id, a_callback) ->
+    (callback) ->
+      async.each account.friends, (follower_id, a_callback) ->
         Follower.findOne
           follower_id: follower_id
         , (err, follower) ->
@@ -221,21 +178,15 @@ setInterval (->
             #データベースに存在していない場合
             newFollower = new Follower(
               follower_id: follower_id
-              step: FOLLOW_CAME
+              step: steps.followed
             )
-            newFollower.save (err) ->
-              console.log err  if err
-              a_callback()
-              return
-
+            newFollower.save (err) -> a_callback()
           return
-
         return
-
       callback null, "done"
   ], (err, result) ->
     console.log err  if err
-    console.log "series all done. " + result
+    console.log "searched new friends: " + result
     return
 
   return
