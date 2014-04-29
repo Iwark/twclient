@@ -52,14 +52,13 @@
         var i;
         i = 0;
         while (i < this.follower_list.length) {
-          if (parseInt(follower_id) === parseInt(this.friend_list[i])) {
+          if (parseInt(follower_id) === parseInt(this.follower_list[i])) {
             return true;
           }
           i++;
         }
         return false;
       });
-      console.log("friends:" + this.friends);
       next(null);
     };
 
@@ -73,10 +72,9 @@
             follower_id: follower_id,
             step: step
           });
-          newFollower.save(function(err) {
+          return newFollower.save(function(err) {
             return next();
           });
-          return console.log("found newFollower" + newFollower);
         } else {
           return next();
         }

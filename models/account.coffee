@@ -44,10 +44,9 @@ class Account
     @friends = @follower_list.filter (follower_id) ->
       i = 0
       while i < @follower_list.length
-        return true  if parseInt(follower_id) is parseInt(@friend_list[i])
+        return true  if parseInt(follower_id) is parseInt(@follower_list[i])
         i++
       false
-    console.log "friends:"+@friends
     next null
     return
 
@@ -63,7 +62,6 @@ class Account
           step: step
         )
         newFollower.save (err) -> next()
-        console.log "found newFollower"+newFollower
       else next()
     return
 
