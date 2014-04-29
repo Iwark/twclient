@@ -59,6 +59,7 @@
         }
         return false;
       });
+      console.log("friends:" + this.friends);
       next(null);
     };
 
@@ -72,9 +73,10 @@
             follower_id: follower_id,
             step: step
           });
-          return newFollower.save(function(err) {
+          newFollower.save(function(err) {
             return next();
           });
+          return console.log("found newFollower" + newFollower);
         } else {
           return next();
         }

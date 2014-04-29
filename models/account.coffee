@@ -47,6 +47,7 @@ class Account
         return true  if parseInt(follower_id) is parseInt(@friend_list[i])
         i++
       false
+    console.log "friends:"+@friends
     next null
     return
 
@@ -62,6 +63,7 @@ class Account
           step: step
         )
         newFollower.save (err) -> next()
+        console.log "found newFollower"+newFollower
       else next()
     return
 
