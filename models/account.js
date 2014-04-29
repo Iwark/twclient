@@ -112,7 +112,7 @@
                 if (follower.last_sent_at) {
                   lastDate = follower.last_sent_at;
                   createdDate = new Date(directMessage["created_at"]);
-                  if (createdDate - lastDate <= 10) {
+                  if (createdDate - lastDate <= 3) {
                     callback();
                   }
                 }

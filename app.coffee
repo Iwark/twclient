@@ -43,7 +43,8 @@ async.waterfall [
   console.log err  if err
   console.log "marked friends as finished: " + result
 
-setInterval (->
+#メインの繰り返し処理
+main = () ->
   # 送信待ちの段階にあるフォロワーへのDM送信
   account.sent_in_interval = 0
   async.each [
@@ -92,4 +93,8 @@ setInterval (->
     console.log err  if err
     console.log "searched new friends: " + result
 
-), INTERVAL
+# 初回15分待つのをやめる。
+main()
+
+# ループ開始
+setInterval main, INTERVAL

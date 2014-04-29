@@ -20,7 +20,8 @@
       "default": 0
     },
     last_sent_at: {
-      type: Date
+      type: Date,
+      "default": new Date()
     },
     messages: {
       type: Array,

@@ -16,6 +16,7 @@ FollowerSchema = new Schema(
 
   last_sent_at:
     type: Date
+    default: new Date()
 
   messages:
     type: Array

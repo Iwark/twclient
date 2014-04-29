@@ -93,7 +93,7 @@ class Account
               if follower.last_sent_at
                 lastDate = follower.last_sent_at
                 createdDate = new Date(directMessage["created_at"])
-                callback() if createdDate - lastDate <= 10
+                callback() if createdDate - lastDate <= 3
               follower.step++
               follower.screen_name = directMessage["sender_screen_name"]
               follower.messages.push(directMessage["text"])
