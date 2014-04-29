@@ -75,7 +75,6 @@ class Account
       if !err && directMessages && directMessages.length > 0
         @last_sent_dm_id = directMessages[0]["id"]
         @direct_messages = directMessages;
-        console.log "directMessages :" + JSON.stringify(directMessages)
         next()
     return
 
