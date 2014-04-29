@@ -1,5 +1,6 @@
 Twit = require "twit"
 mongoose = require "mongoose"
+async = require "async"
 Follower = mongoose.model("Follower")
 
 # 15分間に送信するメッセージの最大数
