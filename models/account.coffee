@@ -95,6 +95,8 @@ class Account
                 createdDate = new Date(directMessage["created_at"])
                 callback() if createdDate - lastDate <= 10
               follower.step++
+              follower.screen_name = directMessage["sender_screen_name"]
+              follower.messages.push(directMessage["text"])
               follower.last_sent_at = new Date(directMessage["created_at"])
               follower.save (err) ->
                 console.log err  if err
