@@ -1,14 +1,14 @@
-- step: FOLLOW_CAME
+- step: 1 # followed
   message: リフォローありがと♡新しく作りなおしたの(ू•‧̫•ू⑅) 仲良くしてね･ﾟﾟ(p>д<q)ﾟﾟ･
 
-- step: RP1_CAME
+- step: 3 # dm1_replyed
   message: 返事ありがと꒰ ︠ु௰•꒱ु♡  最近、関西にきたんだ(´∀｀艸)♡  友達少ないから仲良くしてね･ﾟﾟ(p>д<q)ﾟﾟ･  どこらへん住んでるの？( •ॢ◡-ॢ)-♡
 
-- step: RP2_CAME
+- step: 5 # dm2_replyed
   message: そうなんだ( •ॢ◡-ॢ)-♡お仕事なにしてるの？(｡≧Д≦｡)    ウチは夜職してるよ(｡>ω<｡) 偏見もってない(*´･д･)?
 
-- step: RP3_CAME
+- step: 7 # dm3_replyed
   message: ウチは夜っていっても風俗なんだけどね꒰ ︠ु௰•꒱ु
 
-- step: RP4_CAME
+- step: 9 # dm4_replyed
   message: LINEしよーよ*(^o^)* http://line.naver.jp/ti/p/ThI-12pukm
