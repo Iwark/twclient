@@ -56,7 +56,7 @@ setInterval (->
     messages.forEach (mes) ->
       if mes["step"] is step
         message = mes["message"]
-    account.sendDirectMessages step message callback
+    account.sendDirectMessages step, message, callback
 
   # DMの検出
   async.waterfall [

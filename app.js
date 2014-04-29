@@ -28,7 +28,7 @@
 
   Account = require("./models/account");
 
-  account = new Account(accounts[0]);
+  account = new Account(accounts[2]);
 
   INTERVAL = 15 * 60 * 1000;
 
@@ -62,7 +62,7 @@
           return message = mes["message"];
         }
       });
-      return account.sendDirectMessages(step(message(callback)));
+      return account.sendDirectMessages(step, message, callback);
     });
     async.waterfall([
       function(callback) {
