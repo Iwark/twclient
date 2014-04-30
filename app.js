@@ -41,7 +41,7 @@
       return account.getFriends(follow_list, follower_list, callback);
     }, function(friends, callback) {
       async.each(friends, function(follower_id, a_callback) {
-        return account.createFollowerIfNotExists(follwer_id, steps.finished, a_callback);
+        return account.createFollowerIfNotExists(follower_id, steps.finished, a_callback);
       });
       return callback(null, "done");
     }
@@ -85,7 +85,7 @@
         return account.getFriends(follow_list, follower_list, callback);
       }, function(friends, callback) {
         async.each(friends, function(follower_id, a_callback) {
-          return account.createFollowerIfNotExists(follwer_id, steps.followed, a_callback);
+          return account.createFollowerIfNotExists(follower_id, steps.followed, a_callback);
         });
         return callback(null, "done");
       }

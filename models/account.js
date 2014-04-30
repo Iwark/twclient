@@ -58,7 +58,6 @@
         }
         return false;
       });
-      console.log("friends: " + this.friends);
       next(null, this.friends);
     };
 

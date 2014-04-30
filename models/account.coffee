@@ -44,7 +44,6 @@ class Account
         return true  if parseInt(follower_id) is parseInt(follow_list[i])
         i++
       false
-    console.log "friends: " + @friends
     next null, @friends
     return
 
