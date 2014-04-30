@@ -37,7 +37,7 @@ async.waterfall [
   # データベースに存在していなければ作成
   (friends, callback) ->
     async.each friends, (follower_id, a_callback) ->
-      account.createFollowerIfNotExists follwer_id, steps.finished, a_callback
+      account.createFollowerIfNotExists follower_id, steps.finished, a_callback
     callback null, "done"
 ], (err, result) ->
   console.log err  if err
@@ -87,7 +87,7 @@ main = () ->
     # データベースに存在していなければ作成
     (friends, callback) ->
       async.each friends, (follower_id, a_callback) ->
-        account.createFollowerIfNotExists follwer_id, steps.followed, a_callback
+        account.createFollowerIfNotExists follower_id, steps.followed, a_callback
       callback null, "done"
   ], (err, result) ->
     console.log err  if err
