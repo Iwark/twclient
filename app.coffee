@@ -29,14 +29,14 @@ async.waterfall [
   (callback) -> account.getFollowList callback
 
   # フォロワーリストの取得
-  (callback) -> account.getFollowerList callback
+  (follow_list, callback) -> account.getFollowerList follow_list, callback
 
   # フレンド（相互フォロー）の取得
-  (callback) -> account.getFriends callback
+  (follow_list, follower_list, callback) -> account.getFriends follow_list, follower_list, callback
 
   # データベースに存在していなければ作成
-  (callback) ->
-    async.each account.friends, (follower_id, a_callback) ->
+  (friends, callback) ->
+    async.each friends, (follower_id, a_callback) ->
       account.createFollowerIfNotExists follwer_id, steps.finished, a_callback
     callback null, "done"
 ], (err, result) ->
@@ -66,7 +66,7 @@ main = () ->
     (callback) -> account.getDirectMessages callback
 
     # DMを送ってきたフォロワーの段階を１段階上げる
-    (callback) -> account.stepUpFollower([steps.dm1_sent, steps.dm2_sent, steps.dm3_sent, steps.dm4_sent], callback)
+    (direct_messages, callback) -> account.stepUpFollower(direct_messages, [steps.dm1_sent, steps.dm2_sent, steps.dm3_sent, steps.dm4_sent], callback)
 
   ], (err, result) ->
     console.log err  if err
@@ -79,15 +79,15 @@ main = () ->
     (callback) -> account.getFollowList callback
 
     # フォロワーリストの取得
-    (callback) -> account.getFollowerList callback
+    (follow_list, callback) -> account.getFollowerList follow_list, callback
 
     # フレンド（相互フォロー）の取得
-    (callback) -> account.getFriends callback
+    (follow_list, follower_list, callback) -> account.getFriends follow_list, follower_list, callback
 
     # データベースに存在していなければ作成
-    (callback) ->
-      async.each account.friends, (follower_id, a_callback) ->
-        account.createFollowerIfNotExists follower_id, steps.followed, a_callback
+    (friends, callback) ->
+      async.each friends, (follower_id, a_callback) ->
+        account.createFollowerIfNotExists follwer_id, steps.followed, a_callback
       callback null, "done"
   ], (err, result) ->
     console.log err  if err

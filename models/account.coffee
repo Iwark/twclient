@@ -18,7 +18,6 @@ class Account
     @last_sent_dm_id = "457450918217130000"
     @direct_messages = []
     @sent_in_interval = 0
-    return
 
   # フレンドリストの取得
   getFollowList: (next) ->
@@ -26,29 +25,27 @@ class Account
       screen_name: @screen_name
     , (err, reply) ->
       @follow_list = reply["ids"]  unless err
-      console.log "follow_list: " + @follow_list
-      next err
+      next err, @follow_list
 
   # フォロワーリストの取得
-  getFollowerList: (next) ->
+  getFollowerList: (follow_list, next) ->
     @T.get "followers/ids",
       screen_name: @screen_name
     , (err, reply) ->
       unless err
         @follower_list = reply["ids"]
-      console.log "follower_list: " + @follower_list
-      next err
+      next err, follow_list, @follower_list
 
   # フレンド（相互フォロー）の取得
-  getFriends: (next) ->
-    @friends = @follower_list.filter (follower_id) ->
+  getFriends: (follow_list, follower_list, next) ->
+    @friends = follower_list.filter (follower_id) ->
       i = 0
-      while i < @follow_list.length
-        return true  if parseInt(follower_id) is parseInt(@follow_list[i])
+      while i < follow_list.length
+        return true  if parseInt(follower_id) is parseInt(follow_list[i])
         i++
       false
     console.log "friends: " + @friends
-    next null
+    next null, @friends
     return
 
   # フォロワーをDBに新規作成
@@ -76,12 +73,12 @@ class Account
       if !err && directMessages && directMessages.length > 0
         @last_sent_dm_id = directMessages[0]["id"]
         @direct_messages = directMessages;
-        next()
+        next null, @direct_messages
     return
 
   # 該当するフォロワーの段階を１段階上げる
-  stepUpFollower: (steps, next) ->
-    async.each @direct_messages, (directMessage, callback) ->
+  stepUpFollower: (direct_messages, steps, next) ->
+    async.each direct_messages, (directMessage, callback) ->
       Follower.findOne
         follower_id: directMessage["sender_id"]
       , (err, follower) ->
@@ -132,4 +129,5 @@ class Account
               else next()
           else next()
       else next()
+
 module.exports = Account

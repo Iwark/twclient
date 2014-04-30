@@ -22,7 +22,6 @@
       this.last_sent_dm_id = "457450918217130000";
       this.direct_messages = [];
       this.sent_in_interval = 0;
-      return;
     }
 
     Account.prototype.getFollowList = function(next) {
@@ -32,29 +31,27 @@
         if (!err) {
           this.follow_list = reply["ids"];
         }
-        console.log("follow_list: " + this.follow_list);
-        return next(err);
+        return next(err, this.follow_list);
       });
     };
 
-    Account.prototype.getFollowerList = function(next) {
+    Account.prototype.getFollowerList = function(follow_list, next) {
       return this.T.get("followers/ids", {
         screen_name: this.screen_name
       }, function(err, reply) {
         if (!err) {
           this.follower_list = reply["ids"];
         }
-        console.log("follower_list: " + this.follower_list);
-        return next(err);
+        return next(err, follow_list, this.follower_list);
       });
     };
 
-    Account.prototype.getFriends = function(next) {
-      this.friends = this.follower_list.filter(function(follower_id) {
+    Account.prototype.getFriends = function(follow_list, follower_list, next) {
+      this.friends = follower_list.filter(function(follower_id) {
         var i;
         i = 0;
-        while (i < this.follow_list.length) {
-          if (parseInt(follower_id) === parseInt(this.follow_list[i])) {
+        while (i < follow_list.length) {
+          if (parseInt(follower_id) === parseInt(follow_list[i])) {
             return true;
           }
           i++;
@@ -62,7 +59,7 @@
         return false;
       });
       console.log("friends: " + this.friends);
-      next(null);
+      next(null, this.friends);
     };
 
     Account.prototype.createFollowerIfNotExists = function(follower_id, step, next) {
@@ -95,13 +92,13 @@
         if (!err && directMessages && directMessages.length > 0) {
           this.last_sent_dm_id = directMessages[0]["id"];
           this.direct_messages = directMessages;
-          return next();
+          return next(null, this.direct_messages);
         }
       });
     };
 
-    Account.prototype.stepUpFollower = function(steps, next) {
-      async.each(this.direct_messages, function(directMessage, callback) {
+    Account.prototype.stepUpFollower = function(direct_messages, steps, next) {
+      async.each(direct_messages, function(directMessage, callback) {
         return Follower.findOne({
           follower_id: directMessage["sender_id"]
         }, function(err, follower) {

@@ -35,12 +35,12 @@
   async.waterfall([
     function(callback) {
       return account.getFollowList(callback);
-    }, function(callback) {
-      return account.getFollowerList(callback);
-    }, function(callback) {
-      return account.getFriends(callback);
-    }, function(callback) {
-      async.each(account.friends, function(follower_id, a_callback) {
+    }, function(follow_list, callback) {
+      return account.getFollowerList(follow_list, callback);
+    }, function(follow_list, follower_list, callback) {
+      return account.getFriends(follow_list, follower_list, callback);
+    }, function(friends, callback) {
+      async.each(friends, function(follower_id, a_callback) {
         return account.createFollowerIfNotExists(follwer_id, steps.finished, a_callback);
       });
       return callback(null, "done");
@@ -67,8 +67,8 @@
     async.waterfall([
       function(callback) {
         return account.getDirectMessages(callback);
-      }, function(callback) {
-        return account.stepUpFollower([steps.dm1_sent, steps.dm2_sent, steps.dm3_sent, steps.dm4_sent], callback);
+      }, function(direct_messages, callback) {
+        return account.stepUpFollower(direct_messages, [steps.dm1_sent, steps.dm2_sent, steps.dm3_sent, steps.dm4_sent], callback);
       }
     ], function(err, result) {
       if (err) {
@@ -79,13 +79,13 @@
     return async.waterfall([
       function(callback) {
         return account.getFollowList(callback);
-      }, function(callback) {
-        return account.getFollowerList(callback);
-      }, function(callback) {
-        return account.getFriends(callback);
-      }, function(callback) {
-        async.each(account.friends, function(follower_id, a_callback) {
-          return account.createFollowerIfNotExists(follower_id, steps.followed, a_callback);
+      }, function(follow_list, callback) {
+        return account.getFollowerList(follow_list, callback);
+      }, function(follow_list, follower_list, callback) {
+        return account.getFriends(follow_list, follower_list, callback);
+      }, function(friends, callback) {
+        async.each(friends, function(follower_id, a_callback) {
+          return account.createFollowerIfNotExists(follwer_id, steps.followed, a_callback);
         });
         return callback(null, "done");
       }
