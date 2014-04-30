@@ -26,6 +26,8 @@ class Account
     , (err, reply) ->
       @follow_list = reply["ids"]  unless err
       next err, @follow_list
+      return
+    return
 
   # フォロワーリストの取得
   getFollowerList: (follow_list, next) ->
@@ -35,6 +37,8 @@ class Account
       unless err
         @follower_list = reply["ids"]
       next err, follow_list, @follower_list
+      return
+    return
 
   # フレンド（相互フォロー）の取得
   getFriends: (follow_list, follower_list, next) ->
@@ -58,8 +62,12 @@ class Account
           follower_id: follower_id
           step: step
         )
-        newFollower.save (err) -> next()
-      else next()
+        newFollower.save (err) -> 
+          next()
+          return
+      else 
+        next()
+        return
     return
 
   # DMの取得
@@ -73,6 +81,7 @@ class Account
         @last_sent_dm_id = directMessages[0]["id"]
         @direct_messages = directMessages;
         next null, @direct_messages
+        return
     return
 
   # 該当するフォロワーの段階を１段階上げる
@@ -97,11 +106,15 @@ class Account
               follower.save (err) ->
                 console.log err  if err
                 callback()
+                return
               break
-          callback() if !hit
+          if !hit
+            callback()
+            return
         else
           console.log err  if err
           callback()
+          return
     next null, "done"
     return
 
@@ -111,7 +124,7 @@ class Account
       step: step
     , (err, followers) ->
       if !err && followers && followers.length > 0
-        followers.forEach (follower) ->
+        async.each followers, (follower, callback) ->
           if @sent_in_interval < MAX_NUM_OF_DM
             @sent_in_interval++
             @T.post "direct_messages/new",
@@ -124,9 +137,15 @@ class Account
                 follower.last_sent_at = new Date()
                 follower.save (err) ->
                   console.log err  if err
-                  next()
-              else next()
-          else next()
-      else next()
+                  callback()
+                  return
+              else 
+                callback()
+                return
+          else 
+            callback()
+          return
+      next()
+      return
 
 module.exports = Account

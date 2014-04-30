@@ -25,24 +25,24 @@
     }
 
     Account.prototype.getFollowList = function(next) {
-      return this.T.get("friends/ids", {
+      this.T.get("friends/ids", {
         screen_name: this.screen_name
       }, function(err, reply) {
         if (!err) {
           this.follow_list = reply["ids"];
         }
-        return next(err, this.follow_list);
+        next(err, this.follow_list);
       });
     };
 
     Account.prototype.getFollowerList = function(follow_list, next) {
-      return this.T.get("followers/ids", {
+      this.T.get("followers/ids", {
         screen_name: this.screen_name
       }, function(err, reply) {
         if (!err) {
           this.follower_list = reply["ids"];
         }
-        return next(err, follow_list, this.follower_list);
+        next(err, follow_list, this.follower_list);
       });
     };
 
@@ -72,10 +72,10 @@
             step: step
           });
           return newFollower.save(function(err) {
-            return next();
+            next();
           });
         } else {
-          return next();
+          next();
         }
       });
     };
@@ -91,7 +91,7 @@
         if (!err && directMessages && directMessages.length > 0) {
           this.last_sent_dm_id = directMessages[0]["id"];
           this.direct_messages = directMessages;
-          return next(null, this.direct_messages);
+          next(null, this.direct_messages);
         }
       });
     };
@@ -122,19 +122,19 @@
                   if (err) {
                     console.log(err);
                   }
-                  return callback();
+                  callback();
                 });
                 break;
               }
             }
             if (!hit) {
-              return callback();
+              callback();
             }
           } else {
             if (err) {
               console.log(err);
             }
-            return callback();
+            callback();
           }
         });
       });
@@ -146,10 +146,10 @@
         step: step
       }, function(err, followers) {
         if (!err && followers && followers.length > 0) {
-          return followers.forEach(function(follower) {
+          async.each(followers, function(follower, callback) {
             if (this.sent_in_interval < MAX_NUM_OF_DM) {
               this.sent_in_interval++;
-              return this.T.post("direct_messages/new", {
+              this.T.post("direct_messages/new", {
                 user_id: follower.follower_id,
                 text: message
               }, function(err, reply) {
@@ -161,19 +161,18 @@
                     if (err) {
                       console.log(err);
                     }
-                    return next();
+                    callback();
                   });
                 } else {
-                  return next();
+                  callback();
                 }
               });
             } else {
-              return next();
+              callback();
             }
           });
-        } else {
-          return next();
         }
+        next();
       });
     };
 
