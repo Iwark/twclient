@@ -145,7 +145,10 @@ class Account
           else 
             callback()
           return
-      next()
-      return
+        next()
+        return
+      else
+        next()
+        return
 
 module.exports = Account

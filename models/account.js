@@ -171,8 +171,10 @@
               callback();
             }
           });
+          next();
+        } else {
+          next();
         }
-        next();
       });
     };
 
