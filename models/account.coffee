@@ -26,8 +26,8 @@ class Account
       screen_name: @screen_name
     , (err, reply) ->
       @follow_list = reply["ids"]  unless err
+      console.log "follow_list: " + @follow_list
       next err
-      return
 
   # フォロワーリストの取得
   getFollowerList: (next) ->
@@ -36,17 +36,18 @@ class Account
     , (err, reply) ->
       unless err
         @follower_list = reply["ids"]
+      console.log "follower_list: " + @follower_list
       next err
-      return
 
   # フレンド（相互フォロー）の取得
   getFriends: (next) ->
     @friends = @follower_list.filter (follower_id) ->
       i = 0
-      while i < @follower_list.length
-        return true  if parseInt(follower_id) is parseInt(@follower_list[i])
+      while i < @follow_list.length
+        return true  if parseInt(follower_id) is parseInt(@follow_list[i])
         i++
       false
+    console.log "friends: " + @friends
     next null
     return
 

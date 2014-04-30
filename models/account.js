@@ -32,7 +32,8 @@
         if (!err) {
           this.follow_list = reply["ids"];
         }
-        next(err);
+        console.log("follow_list: " + this.follow_list);
+        return next(err);
       });
     };
 
@@ -43,7 +44,8 @@
         if (!err) {
           this.follower_list = reply["ids"];
         }
-        next(err);
+        console.log("follower_list: " + this.follower_list);
+        return next(err);
       });
     };
 
@@ -51,14 +53,15 @@
       this.friends = this.follower_list.filter(function(follower_id) {
         var i;
         i = 0;
-        while (i < this.follower_list.length) {
-          if (parseInt(follower_id) === parseInt(this.follower_list[i])) {
+        while (i < this.follow_list.length) {
+          if (parseInt(follower_id) === parseInt(this.follow_list[i])) {
             return true;
           }
           i++;
         }
         return false;
       });
+      console.log("friends: " + this.friends);
       next(null);
     };
 
