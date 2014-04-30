@@ -11,7 +11,7 @@ class Account
   # 初期化処理
   constructor: (account) ->
     @T = new Twit account
-    @screen_name = account.name
+    @screen_name = account.screen_name
     @follow_list = []
     @follower_list = []
     @friends = []
