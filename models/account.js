@@ -15,7 +15,7 @@
   Account = (function() {
     function Account(account) {
       this.T = new Twit(account);
-      this.screen_name = account.name;
+      this.screen_name = account.screen_name;
       this.follow_list = [];
       this.follower_list = [];
       this.friends = [];
