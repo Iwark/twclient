@@ -108,7 +108,7 @@
         self.T.get("direct_messages", param, function(err, directMessages) {
           if (!err && directMessages && directMessages.length > 0) {
             self.direct_messages = self.direct_messages.concat(directMessages);
-            callback;
+            callback();
           }
         });
       });
@@ -125,33 +125,30 @@
             hit = false;
             for (step in steps) {
               if (parseInt(follower.step) === parseInt(step)) {
-                hit = true;
-                if (follower.last_sent_at) {
-                  lastDate = follower.last_sent_at;
-                  createdDate = new Date(directMessage["created_at"]);
-                  if (createdDate - lastDate <= 3) {
-                    printLog("too close date: " + createdDate + " - " + lastDate);
-                    callback();
-                    return;
-                  }
-                }
-                follower.step++;
-                follower.screen_name = directMessage["sender_screen_name"];
-                if (directMessage["text"]) {
-                  follower.messages.push(directMessage["text"]);
-                }
-                follower.last_sent_at = new Date(directMessage["created_at"]);
-                follower.save(function(err) {
-                  if (err) {
-                    printLog(err);
-                  }
+                lastDate = follower.last_sent_at;
+                createdDate = new Date(directMessage["created_at"]);
+                if (lastDate && createdDate - lastDate <= 3) {
+                  printLog("too close date: " + createdDate + " - " + lastDate);
+                } else {
+                  hit = true;
+                  follower.step++;
+                  follower.screen_name = directMessage["sender_screen_name"];
                   if (directMessage["text"]) {
-                    printLog("got new message from " + follower.screen_name + "(" + follower.follower_id + ") : " + directMessage["text"]);
+                    follower.messages.push(directMessage["text"]);
                   }
-                  printLog("follower " + follower.screen_name + "(" + follower.follower_id + ")" + " step up: " + (follower.step - 1) + " -> " + follower.step);
-                  callback();
-                });
-                break;
+                  follower.last_sent_at = new Date(directMessage["created_at"]);
+                  follower.save(function(err) {
+                    if (err) {
+                      printLog(err);
+                    }
+                    if (directMessage["text"]) {
+                      printLog("got new message from " + follower.screen_name + "(" + follower.follower_id + ") : " + directMessage["text"]);
+                    }
+                    printLog("follower " + follower.screen_name + "(" + follower.follower_id + ")" + " step up: " + (follower.step - 1) + " -> " + follower.step);
+                    callback();
+                  });
+                  break;
+                }
               }
             }
             if (!hit) {

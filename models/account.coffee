@@ -91,7 +91,7 @@ class Account
       self.T.get "direct_messages", param, (err, directMessages) ->
         if !err && directMessages && directMessages.length > 0
           self.direct_messages = self.direct_messages.concat(directMessages);
-          callback
+          callback()
         return
       return
     next null, self.direct_messages
@@ -107,25 +107,23 @@ class Account
           hit = false
           for step of steps
             if parseInt(follower.step) is parseInt(step)
-              hit = true
-              if follower.last_sent_at
-                lastDate = follower.last_sent_at
-                createdDate = new Date(directMessage["created_at"])
-                if createdDate - lastDate <= 3
-                  printLog "too close date: " + createdDate + " - " + lastDate
+              lastDate = follower.last_sent_at
+              createdDate = new Date(directMessage["created_at"])
+              if lastDate && createdDate - lastDate <= 3
+                printLog "too close date: " + createdDate + " - " + lastDate
+              else
+                hit = true
+                follower.step++
+                follower.screen_name = directMessage["sender_screen_name"]
+                follower.messages.push(directMessage["text"]) if directMessage["text"]
+                follower.last_sent_at = new Date(directMessage["created_at"])
+                follower.save (err) ->
+                  printLog err  if err
+                  printLog "got new message from " + follower.screen_name + "(" + follower.follower_id + ") : " + directMessage["text"] if directMessage["text"]
+                  printLog "follower " + follower.screen_name + "(" + follower.follower_id + ")" + " step up: " + (follower.step-1) + " -> " + follower.step
                   callback()
                   return
-              follower.step++
-              follower.screen_name = directMessage["sender_screen_name"]
-              follower.messages.push(directMessage["text"]) if directMessage["text"]
-              follower.last_sent_at = new Date(directMessage["created_at"])
-              follower.save (err) ->
-                printLog err  if err
-                printLog "got new message from " + follower.screen_name + "(" + follower.follower_id + ") : " + directMessage["text"] if directMessage["text"]
-                printLog "follower " + follower.screen_name + "(" + follower.follower_id + ")" + " step up: " + (follower.step-1) + " -> " + follower.step
-                callback()
-                return
-              break
+                break
           if !hit
             callback()
             return
