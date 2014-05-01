@@ -116,7 +116,9 @@
     };
 
     Account.prototype.stepUpFollower = function(direct_messages, steps, next) {
+      console.log("trying to get direct_messages: " + direct_messages.length + ":" + direct_messages);
       async.each(direct_messages, function(directMessage, callback) {
+        console.log(directMessage["text"]);
         return Follower.findOne({
           follower_id: directMessage["sender_id"]
         }, function(err, follower) {
