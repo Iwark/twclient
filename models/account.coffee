@@ -24,7 +24,6 @@ class Account
     @follow_list = []
     @follower_list = []
     @friends = []
-    @last_sent_dm_id = "457450918217130000"
     @direct_messages = []
     @sent_in_interval = 0
 
@@ -84,19 +83,18 @@ class Account
   # DMの取得
   getDirectMessages: (next) ->
     self = this
-    param =
-      include_entities: false
-      skip_status: true
-      since_id: @last_sent_dm_id
-    @T.get "direct_messages", param, (err, directMessages) ->
-      if !err && directMessages && directMessages.length > 0
-        self.last_sent_dm_id = directMessages[0]["id"]
-        self.direct_messages = directMessages;
-        next null, directMessages
-      else
-        printLog "no new direct_messages found."
-        next null, []
+    async.each [1,2,3], (page, callback) ->
+      param =
+        include_entities: false
+        skip_status: true
+        page: page
+      self.T.get "direct_messages", param, (err, directMessages) ->
+        if !err && directMessages && directMessages.length > 0
+          self.direct_messages = self.direct_messages.concat(directMessages);
+          callback
+        return
       return
+    next null, self.direct_messages
     return
 
   # 該当するフォロワーの段階を１段階上げる

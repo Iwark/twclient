@@ -33,7 +33,6 @@
       this.follow_list = [];
       this.follower_list = [];
       this.friends = [];
-      this.last_sent_dm_id = "457450918217130000";
       this.direct_messages = [];
       this.sent_in_interval = 0;
     }
@@ -97,23 +96,23 @@
     };
 
     Account.prototype.getDirectMessages = function(next) {
-      var param, self;
+      var self;
       self = this;
-      param = {
-        include_entities: false,
-        skip_status: true,
-        since_id: this.last_sent_dm_id
-      };
-      this.T.get("direct_messages", param, function(err, directMessages) {
-        if (!err && directMessages && directMessages.length > 0) {
-          self.last_sent_dm_id = directMessages[0]["id"];
-          self.direct_messages = directMessages;
-          next(null, directMessages);
-        } else {
-          printLog("no new direct_messages found.");
-          next(null, []);
-        }
+      async.each([1, 2, 3], function(page, callback) {
+        var param;
+        param = {
+          include_entities: false,
+          skip_status: true,
+          page: page
+        };
+        self.T.get("direct_messages", param, function(err, directMessages) {
+          if (!err && directMessages && directMessages.length > 0) {
+            self.direct_messages = self.direct_messages.concat(directMessages);
+            callback;
+          }
+        });
       });
+      next(null, self.direct_messages);
     };
 
     Account.prototype.stepUpFollower = function(direct_messages, steps, next) {
