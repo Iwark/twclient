@@ -98,7 +98,7 @@
     Account.prototype.getDirectMessages = function(next) {
       var self;
       self = this;
-      async.each([1, 2, 3], function(page, callback) {
+      async.each([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], function(page, callback) {
         var param;
         param = {
           include_entities: false,

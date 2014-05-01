@@ -83,7 +83,7 @@ class Account
   # DMの取得
   getDirectMessages: (next) ->
     self = this
-    async.each [1,2,3], (page, callback) ->
+    async.each [1..10], (page, callback) ->
       param =
         include_entities: false
         skip_status: true
