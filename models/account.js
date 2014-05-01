@@ -133,6 +133,7 @@
                   if (createdDate - lastDate <= 3) {
                     printLog("too close date: " + createdDate + " - " + lastDate);
                     callback();
+                    return;
                   }
                 }
                 follower.step++;
