@@ -43,7 +43,7 @@
       async.each(friends, function(follower_id, a_callback) {
         return account.createFollowerIfNotExists(follower_id, steps.finished, a_callback);
       });
-      return callback("done");
+      return callback(null, "done");
     }
   ], function(err, result) {
     if (err) {
@@ -53,13 +53,14 @@
   });
 
   main = function() {
+    account = new Account(accounts[2]);
     account.sent_in_interval = 0;
     async.each([steps.dm4_replyed, steps.dm3_replyed, steps.dm2_replyed, steps.dm1_replyed, steps.followed], function(step, callback) {
       var message;
       message = "";
       messages.forEach(function(mes) {
         if (parseInt(mes["step"]) === parseInt(step)) {
-          return message = mes["message"];
+          message = mes["message"];
         }
       });
       account.sendDirectMessages(step, message, callback);
@@ -87,7 +88,7 @@
         async.each(friends, function(follower_id, a_callback) {
           return account.createFollowerIfNotExists(follower_id, steps.followed, a_callback);
         });
-        return callback("done");
+        return callback(null, "done");
       }
     ], function(err, result) {
       if (err) {
