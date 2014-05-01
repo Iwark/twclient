@@ -73,6 +73,7 @@ class Account
         )
         newFollower.save (err) -> 
           printLog "found new Friend :" + follower_id
+          printLog "follower " + newFollower.follower_id + " step up: " + (newFollower.step-1) + " -> " + newFollower.step
           next()
           return
       else 
@@ -100,7 +101,6 @@ class Account
 
   # 該当するフォロワーの段階を１段階上げる
   stepUpFollower: (direct_messages, steps, next) ->
-    printLog "trying to step up " + direct_messages.length + " direct_messages..."
     async.each direct_messages, (directMessage, callback) ->
       Follower.findOne
         follower_id: directMessage["sender_id"]
@@ -113,8 +113,9 @@ class Account
               if follower.last_sent_at
                 lastDate = follower.last_sent_at
                 createdDate = new Date(directMessage["created_at"])
-                callback() if createdDate - lastDate <= 3
-                return
+                if createdDate - lastDate <= 3
+                  printLog "too close date: " + createdDate + " - " + lastDate
+                  callback()
               follower.step++
               follower.screen_name = directMessage["sender_screen_name"]
               follower.messages.push(directMessage["text"]) if directMessage["text"]
@@ -127,11 +128,14 @@ class Account
                 return
               break
           if !hit
-            printLog "did not hit any of steps: " + follower.step + " (" + follower.follower_id + ")"
+            printLog "did not hit any of steps: " + directMessage["sender_screen_name"] + " (" + follower.follower_id + ")"
             callback()
             return
         else
-          printLog err  if err
+          if err
+            printLog "err: " + err
+          else
+            printLog "not found the follower: " + directMessage["sender_screen_name"] + " (" + directMessage["sender_id"] + ")"
           callback()
           return
     next null, "done"
