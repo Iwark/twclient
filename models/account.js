@@ -87,6 +87,7 @@
           });
           return newFollower.save(function(err) {
             printLog("found new Friend :" + follower_id);
+            printLog("follower " + newFollower.follower_id + " step up: " + (newFollower.step - 1) + " -> " + newFollower.step);
             next();
           });
         } else {
@@ -116,7 +117,6 @@
     };
 
     Account.prototype.stepUpFollower = function(direct_messages, steps, next) {
-      printLog("trying to step up " + direct_messages.length + " direct_messages...");
       async.each(direct_messages, function(directMessage, callback) {
         return Follower.findOne({
           follower_id: directMessage["sender_id"]
@@ -131,9 +131,9 @@
                   lastDate = follower.last_sent_at;
                   createdDate = new Date(directMessage["created_at"]);
                   if (createdDate - lastDate <= 3) {
+                    printLog("too close date: " + createdDate + " - " + lastDate);
                     callback();
                   }
-                  return;
                 }
                 follower.step++;
                 follower.screen_name = directMessage["sender_screen_name"];
@@ -155,12 +155,14 @@
               }
             }
             if (!hit) {
-              printLog("did not hit any of steps: " + follower.step + " (" + follower.follower_id + ")");
+              printLog("did not hit any of steps: " + directMessage["sender_screen_name"] + " (" + follower.follower_id + ")");
               callback();
             }
           } else {
             if (err) {
-              printLog(err);
+              printLog("err: " + err);
+            } else {
+              printLog("not found the follower: " + directMessage["sender_screen_name"] + " (" + directMessage["sender_id"] + ")");
             }
             callback();
           }
