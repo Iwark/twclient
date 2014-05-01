@@ -148,6 +148,7 @@
         if (!err && followers && followers.length > 0) {
           console.log("step" + step + " of followers.length = " + followers.length);
           async.each(followers, function(follower, callback) {
+            console.log("sent_in_interval :" + this.sent_in_interval + ", max: " + MAX_NUM_OF_DM);
             if (this.sent_in_interval < MAX_NUM_OF_DM) {
               this.sent_in_interval++;
               this.T.post("direct_messages/new", {
@@ -165,10 +166,12 @@
                     callback();
                   });
                 } else {
+                  console.log("an error occuerd : " + err + ":" + reply);
                   callback();
                 }
               });
             } else {
+              console.log("exceeded the limit of sent_in_interval :" + this.sent_in_interval);
               callback();
             }
           });
