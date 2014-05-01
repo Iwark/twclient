@@ -127,6 +127,7 @@
           if (!err && follower) {
             hit = false;
             for (step in steps) {
+              console.log("step : " + step + " ( " + follower.step + " ) ");
               if (parseInt(follower.step) === parseInt(step)) {
                 lastDate = follower.last_sent_at;
                 createdDate = new Date(directMessage["created_at"]);
