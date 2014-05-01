@@ -18,13 +18,13 @@
 
   now = new Date();
 
-  title = "log(" + now.toLocaleString() + ")";
+  title = "TWclient Sever Log.";
 
   logFile = fs.readFileSync('./twlog', 'utf-8');
 
   mailOptions = {
     from: "twclient <iwark02@gmail.com>",
-    to: "iwark02@gmail.com",
+    to: "iwark02@gmail.com, rzmrumgxx@gmail.com",
     subject: title,
     text: logFile.toString()
   };

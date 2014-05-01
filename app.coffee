@@ -50,7 +50,6 @@ async.waterfall [
     callback null, "done"
 ], (err, result) ->
   printLog err  if err
-  printLog "marked friends as finished: " + result
 
 #メインの繰り返し処理
 main = () ->
@@ -81,7 +80,6 @@ main = () ->
 
   ], (err, result) ->
     printLog err  if err
-    printLog "checked direct messages: " + result
 
   # リフォローの検出
   async.waterfall [
@@ -102,7 +100,6 @@ main = () ->
       callback null, "done"
   ], (err, result) ->
     printLog err  if err
-    printLog "searched new friends: " + result
 
 # 初回15分待つのをやめる。
 main()

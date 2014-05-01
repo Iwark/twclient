@@ -59,9 +59,8 @@
     }
   ], function(err, result) {
     if (err) {
-      printLog(err);
+      return printLog(err);
     }
-    return printLog("marked friends as finished: " + result);
   });
 
   main = function() {
@@ -84,9 +83,8 @@
       }
     ], function(err, result) {
       if (err) {
-        printLog(err);
+        return printLog(err);
       }
-      return printLog("checked direct messages: " + result);
     });
     return async.waterfall([
       function(callback) {
@@ -103,9 +101,8 @@
       }
     ], function(err, result) {
       if (err) {
-        printLog(err);
+        return printLog(err);
       }
-      return printLog("searched new friends: " + result);
     });
   };
 

@@ -177,6 +177,7 @@
               }, function(err, reply) {
                 if (!err && reply) {
                   follower.step++;
+                  follower.screen_name = reply["recipient_screen_name"];
                   follower.last_sent_at = new Date();
                   return follower.save(function(err) {
                     if (err) {

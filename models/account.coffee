@@ -145,6 +145,7 @@ class Account
             , (err, reply) ->
               if !err && reply
                 follower.step++
+                follower.screen_name = reply["recipient_screen_name"]
                 follower.last_sent_at = new Date()
                 follower.save (err) ->
                   printLog err  if err
