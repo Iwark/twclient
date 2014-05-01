@@ -126,7 +126,7 @@ class Account
       if !err && followers && followers.length > 0
         console.log "step"+step+" of followers.length = "+followers.length
         async.each followers, (follower, callback) ->
-          console.log "sent_in_interval :"+@sent_in_interval+", max: "+MAX_NUM_OF_DM
+          @sent_in_interval = 0 if not @sent_in_interval
           if @sent_in_interval < MAX_NUM_OF_DM
             @sent_in_interval++
             @T.post "direct_messages/new",
@@ -152,7 +152,6 @@ class Account
         next()
       else
         next()
-      console.log "sending direct messages: done."
       return
 
 module.exports = Account
