@@ -1,10 +1,20 @@
 Twit = require "twit"
 mongoose = require "mongoose"
 async = require "async"
+fs = require "fs"
+require "date-utils"
 Follower = mongoose.model("Follower")
 
 # 15分間に送信するメッセージの最大数
 MAX_NUM_OF_DM = 10
+
+printLog = (content) ->
+  logFile = fs.readFileSync "./twlog", "utf-8"
+  date = new Date()
+  date = date.toFormat("MM/DD HH24:MI:SS")
+  logData = "[" + date + "] " + content + "\n"
+  fs.appendFileSync "./twlog", logData
+  console.log logData
 
 class Account
   # 初期化処理
@@ -100,10 +110,12 @@ class Account
                 callback() if createdDate - lastDate <= 3
               follower.step++
               follower.screen_name = directMessage["sender_screen_name"]
-              follower.messages.push(directMessage["text"])
+              follower.messages.push(directMessage["text"]) if directMessage["text"]
               follower.last_sent_at = new Date(directMessage["created_at"])
               follower.save (err) ->
-                console.log err  if err
+                printLog err  if err
+                printLog "got new message from " + follower.screen_name + "(" + follower.follower_id + ") : " + directMessage["text"] if directMessage["text"]
+                printLog "follower " + follower.screen_name + "(" + follower.follower_id + ")" + " step up: " + (follower.step-1) + " -> " + follower.step
                 callback()
                 return
               break
@@ -111,7 +123,7 @@ class Account
             callback()
             return
         else
-          console.log err  if err
+          printLog err  if err
           callback()
           return
     next null, "done"
@@ -124,9 +136,7 @@ class Account
       step: step
     , (err, followers) ->
       if !err && followers && followers.length > 0
-        console.log "step"+step+" of followers.length = "+followers.length
         async.each followers, (follower, callback) ->
-          console.log "self.sent_in_interval = " + self.sent_in_interval
           if self.sent_in_interval < MAX_NUM_OF_DM
             self.sent_in_interval++
             self.T.post "direct_messages/new",
@@ -134,19 +144,20 @@ class Account
               text: message
             , (err, reply) ->
               if !err && reply
-                console.log "step" + step + " DM done :" + reply
                 follower.step++
                 follower.last_sent_at = new Date()
                 follower.save (err) ->
-                  console.log err  if err
+                  printLog err  if err
+                  printLog "step" + step + " DM sent to " + reply["recipient_screen_name"] + "(" + reply["recipient_id"] + ")"
+                  printLog "follower " + follower.screen_name + "(" + follower.follower_id + ")" + " step up: " + (follower.step-1) + " -> " + follower.step
                   callback()
                   return
               else 
-                console.log "an error occuerd : " + err + ":" + reply
+                printLog "an error occuerd : " + err + ":" + reply
                 callback()
                 return
           else 
-            console.log "exceeded the limit of sent_in_interval :" + self.sent_in_interval
+            printLog "exceeded the limit of sent_in_interval :" + self.sent_in_interval
             callback()
           return
         next()

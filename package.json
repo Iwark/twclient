@@ -9,6 +9,8 @@
     "mongoose": "*",
     "twit": "*",
     "async": "*",
-    "js-yaml": "*"
+    "js-yaml": "*",
+    "nodemailer": "*",
+    "date-utils": "*"
   }
 }

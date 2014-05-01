@@ -3,6 +3,15 @@ mongoose = require "mongoose"
 fs = require "fs"
 async = require "async"
 yaml = require "js-yaml"
+require "date-utils"
+
+printLog = (content) ->
+  logFile = fs.readFileSync "./twlog", "utf-8"
+  date = new Date()
+  date = date.toFormat("MM/DD HH24:MI:SS")
+  logData = "[" + date + "] " + content + "\n"
+  fs.appendFileSync "./twlog", logData
+  console.log logData
 
 schema = require "./db/schema.js"
 
@@ -40,8 +49,8 @@ async.waterfall [
       account.createFollowerIfNotExists follower_id, steps.finished, a_callback
     callback null, "done"
 ], (err, result) ->
-  console.log err  if err
-  console.log "marked friends as finished: " + result
+  printLog err  if err
+  printLog "marked friends as finished: " + result
 
 #メインの繰り返し処理
 main = () ->
@@ -71,8 +80,8 @@ main = () ->
     (direct_messages, callback) -> account.stepUpFollower(direct_messages, [steps.dm1_sent, steps.dm2_sent, steps.dm3_sent, steps.dm4_sent], callback)
 
   ], (err, result) ->
-    console.log err  if err
-    console.log "checked direct messages: " + result
+    printLog err  if err
+    printLog "checked direct messages: " + result
 
   # リフォローの検出
   async.waterfall [
@@ -92,8 +101,8 @@ main = () ->
         account.createFollowerIfNotExists follower_id, steps.followed, a_callback
       callback null, "done"
   ], (err, result) ->
-    console.log err  if err
-    console.log "searched new friends: " + result
+    printLog err  if err
+    printLog "searched new friends: " + result
 
 # 初回15分待つのをやめる。
 main()
