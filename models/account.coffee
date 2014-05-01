@@ -111,9 +111,7 @@ class Account
             if parseInt(follower.step) is parseInt(step)
               lastDate = follower.last_sent_at
               createdDate = new Date(directMessage["created_at"])
-              if lastDate && createdDate - lastDate <= 3
-                printLog "too close date: " + createdDate + " - " + lastDate
-              else
+              unless (lastDate && createdDate - lastDate <= 3)
                 hit = true
                 follower.step++
                 follower.screen_name = directMessage["sender_screen_name"]
