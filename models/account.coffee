@@ -101,16 +101,13 @@ class Account
 
   # 該当するフォロワーの段階を１段階上げる
   stepUpFollower: (direct_messages, steps, next) ->
-    console.log "trying to get direct_messages: " + direct_messages.length + ":" + direct_messages
     async.each direct_messages, (directMessage, callback) ->
-      console.log directMessage["text"]
       Follower.findOne
         follower_id: directMessage["sender_id"]
       , (err, follower) ->
         if !err && follower
           hit = false
-          for step of steps
-            console.log("step : " + step + " ( " + follower.step + " ) ")
+          for step in steps
             if parseInt(follower.step) is parseInt(step)
               lastDate = follower.last_sent_at
               createdDate = new Date(directMessage["created_at"])

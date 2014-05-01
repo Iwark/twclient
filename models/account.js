@@ -117,17 +117,15 @@
     };
 
     Account.prototype.stepUpFollower = function(direct_messages, steps, next) {
-      console.log("trying to get direct_messages: " + direct_messages.length + ":" + direct_messages);
       async.each(direct_messages, function(directMessage, callback) {
-        console.log(directMessage["text"]);
         return Follower.findOne({
           follower_id: directMessage["sender_id"]
         }, function(err, follower) {
-          var createdDate, hit, lastDate, step;
+          var createdDate, hit, lastDate, step, _i, _len;
           if (!err && follower) {
             hit = false;
-            for (step in steps) {
-              console.log("step : " + step + " ( " + follower.step + " ) ");
+            for (_i = 0, _len = steps.length; _i < _len; _i++) {
+              step = steps[_i];
               if (parseInt(follower.step) === parseInt(step)) {
                 lastDate = follower.last_sent_at;
                 createdDate = new Date(directMessage["created_at"]);
