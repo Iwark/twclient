@@ -53,7 +53,6 @@
   });
 
   main = function() {
-    account = new Account(accounts[2]);
     account.sent_in_interval = 0;
     async.each([steps.dm4_replyed, steps.dm3_replyed, steps.dm2_replyed, steps.dm1_replyed, steps.followed], function(step, callback) {
       var message;
