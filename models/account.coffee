@@ -116,6 +116,7 @@ class Account
                 if createdDate - lastDate <= 3
                   printLog "too close date: " + createdDate + " - " + lastDate
                   callback()
+                  return
               follower.step++
               follower.screen_name = directMessage["sender_screen_name"]
               follower.messages.push(directMessage["text"]) if directMessage["text"]
