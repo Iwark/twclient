@@ -7,7 +7,6 @@ Follower = mongoose.model("Follower")
 MAX_NUM_OF_DM = 10
 
 class Account
-
   # 初期化処理
   constructor: (account) ->
     @T = new Twit account
@@ -120,6 +119,9 @@ class Account
 
   # DMの送信
   sendDirectMessages: (step, message, next) ->
+    console.log "mes"
+    console.log @T
+    console.log Twit
     Follower.find
       step: step
     , (err, followers) ->

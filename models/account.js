@@ -142,6 +142,9 @@
     };
 
     Account.prototype.sendDirectMessages = function(step, message, next) {
+      console.log("mes");
+      console.log(this.T);
+      console.log(Twit);
       return Follower.find({
         step: step
       }, function(err, followers) {
