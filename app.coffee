@@ -38,7 +38,7 @@ async.waterfall [
   (friends, callback) ->
     async.each friends, (follower_id, a_callback) ->
       account.createFollowerIfNotExists follower_id, steps.finished, a_callback
-    callback "done"
+    callback null, "done"
 ], (err, result) ->
   console.log err  if err
   console.log "marked friends as finished: " + result
@@ -57,6 +57,7 @@ main = () ->
     messages.forEach (mes) ->
       if parseInt(mes["step"]) is parseInt(step)
         message = mes["message"]
+        return
     account.sendDirectMessages step, message, callback
     return
 
@@ -89,7 +90,7 @@ main = () ->
     (friends, callback) ->
       async.each friends, (follower_id, a_callback) ->
         account.createFollowerIfNotExists follower_id, steps.followed, a_callback
-      callback "done"
+      callback null, "done"
   ], (err, result) ->
     console.log err  if err
     console.log "searched new friends: " + result
