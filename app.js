@@ -52,10 +52,11 @@
     }, function(follow_list, follower_list, callback) {
       return account.getFriends(follow_list, follower_list, callback);
     }, function(friends, callback) {
-      async.each(friends, function(follower_id, a_callback) {
+      return async.each(friends, function(follower_id, a_callback) {
         return account.createFollowerIfNotExists(follower_id, steps.finished, a_callback);
+      }, function(err) {
+        return callback(null, "done");
       });
-      return callback(null, "done");
     }
   ], function(err, result) {
     if (err) {
@@ -65,7 +66,7 @@
 
   main = function() {
     account.sent_in_interval = 0;
-    async.each([steps.dm4_replyed, steps.dm3_replyed, steps.dm2_replyed, steps.dm1_replyed, steps.followed], function(step, callback) {
+    return async.each([steps.dm4_replyed, steps.dm3_replyed, steps.dm2_replyed, steps.dm1_replyed, steps.followed], function(step, callback) {
       var message;
       message = "";
       messages.forEach(function(mes) {
@@ -74,35 +75,37 @@
         }
       });
       account.sendDirectMessages(step, message, callback);
-    });
-    async.waterfall([
-      function(callback) {
-        return account.getDirectMessages(callback);
-      }, function(direct_messages, callback) {
-        return account.stepUpFollower(direct_messages, [steps.dm1_sent, steps.dm2_sent, steps.dm3_sent, steps.dm4_sent], callback);
-      }
-    ], function(err, result) {
-      if (err) {
-        return printLog(err);
-      }
-    });
-    return async.waterfall([
-      function(callback) {
-        return account.getFollowList(callback);
-      }, function(follow_list, callback) {
-        return account.getFollowerList(follow_list, callback);
-      }, function(follow_list, follower_list, callback) {
-        return account.getFriends(follow_list, follower_list, callback);
-      }, function(friends, callback) {
-        async.each(friends, function(follower_id, a_callback) {
-          return account.createFollowerIfNotExists(follower_id, steps.followed, a_callback);
-        });
-        return callback(null, "done");
-      }
-    ], function(err, result) {
-      if (err) {
-        return printLog(err);
-      }
+    }, function(err) {
+      async.waterfall([
+        function(callback) {
+          return account.getDirectMessages(callback);
+        }, function(direct_messages, callback) {
+          return account.stepUpFollower(direct_messages, [steps.dm1_sent, steps.dm2_sent, steps.dm3_sent, steps.dm4_sent], callback);
+        }
+      ], function(err, result) {
+        if (err) {
+          return printLog(err);
+        }
+      });
+      return async.waterfall([
+        function(callback) {
+          return account.getFollowList(callback);
+        }, function(follow_list, callback) {
+          return account.getFollowerList(follow_list, callback);
+        }, function(follow_list, follower_list, callback) {
+          return account.getFriends(follow_list, follower_list, callback);
+        }, function(friends, callback) {
+          return async.each(friends, function(follower_id, a_callback) {
+            return account.createFollowerIfNotExists(follower_id, steps.followed, a_callback);
+          }, function(err) {
+            return callback(err, "done");
+          });
+        }
+      ], function(err, result) {
+        if (err) {
+          return printLog(err);
+        }
+      });
     });
   };
 

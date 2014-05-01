@@ -94,7 +94,9 @@ class Account
           callback()
         return
       return
-    next null, self.direct_messages
+    , (err) ->
+      next err, self.direct_messages
+      return
     return
 
   # 該当するフォロワーの段階を１段階上げる
@@ -136,7 +138,9 @@ class Account
             printLog "not found the follower: " + directMessage["sender_screen_name"] + " (" + directMessage["sender_id"] + ")"
           callback()
           return
-    next null, "done"
+    , (err) ->
+      next err, "done"
+      return
     return
 
   # DMの送信
@@ -171,7 +175,9 @@ class Account
             printLog "exceeded the limit of sent_in_interval :" + self.sent_in_interval
             callback()
           return
-        next()
+        , (err) ->
+          next()
+          return
       else
         next()
       return

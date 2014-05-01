@@ -47,7 +47,8 @@ async.waterfall [
   (friends, callback) ->
     async.each friends, (follower_id, a_callback) ->
       account.createFollowerIfNotExists follower_id, steps.finished, a_callback
-    callback null, "done"
+    , (err) ->
+      callback null, "done"
 ], (err, result) ->
   printLog err  if err
 
@@ -68,38 +69,40 @@ main = () ->
         return
     account.sendDirectMessages step, message, callback
     return
+  , (err) ->
 
-  # DMの検出
-  async.waterfall [
+    # DMの検出
+    async.waterfall [
 
-    # DMの取得
-    (callback) -> account.getDirectMessages callback
+      # DMの取得
+      (callback) -> account.getDirectMessages callback
 
-    # DMを送ってきたフォロワーの段階を１段階上げる
-    (direct_messages, callback) -> account.stepUpFollower(direct_messages, [steps.dm1_sent, steps.dm2_sent, steps.dm3_sent, steps.dm4_sent], callback)
+      # DMを送ってきたフォロワーの段階を１段階上げる
+      (direct_messages, callback) -> account.stepUpFollower(direct_messages, [steps.dm1_sent, steps.dm2_sent, steps.dm3_sent, steps.dm4_sent], callback)
 
-  ], (err, result) ->
-    printLog err  if err
+    ], (err, result) ->
+      printLog err  if err
 
-  # リフォローの検出
-  async.waterfall [
+    # リフォローの検出
+    async.waterfall [
 
-    # フォローリストの取得
-    (callback) -> account.getFollowList callback
+      # フォローリストの取得
+      (callback) -> account.getFollowList callback
 
-    # フォロワーリストの取得
-    (follow_list, callback) -> account.getFollowerList follow_list, callback
+      # フォロワーリストの取得
+      (follow_list, callback) -> account.getFollowerList follow_list, callback
 
-    # フレンド（相互フォロー）の取得
-    (follow_list, follower_list, callback) -> account.getFriends follow_list, follower_list, callback
+      # フレンド（相互フォロー）の取得
+      (follow_list, follower_list, callback) -> account.getFriends follow_list, follower_list, callback
 
-    # データベースに存在していなければ作成
-    (friends, callback) ->
-      async.each friends, (follower_id, a_callback) ->
-        account.createFollowerIfNotExists follower_id, steps.followed, a_callback
-      callback null, "done"
-  ], (err, result) ->
-    printLog err  if err
+      # データベースに存在していなければ作成
+      (friends, callback) ->
+        async.each friends, (follower_id, a_callback) ->
+          account.createFollowerIfNotExists follower_id, steps.followed, a_callback
+        , (err) ->
+          callback err, "done"
+    ], (err, result) ->
+      printLog err  if err
 
 # 初回15分待つのをやめる。
 main()

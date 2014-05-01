@@ -111,8 +111,9 @@
             callback();
           }
         });
+      }, function(err) {
+        next(err, self.direct_messages);
       });
-      next(null, self.direct_messages);
     };
 
     Account.prototype.stepUpFollower = function(direct_messages, steps, next) {
@@ -165,8 +166,9 @@
             callback();
           }
         });
+      }, function(err) {
+        next(err, "done");
       });
-      next(null, "done");
     };
 
     Account.prototype.sendDirectMessages = function(step, message, next) {
@@ -204,8 +206,9 @@
               printLog("exceeded the limit of sent_in_interval :" + self.sent_in_interval);
               callback();
             }
+          }, function(err) {
+            next();
           });
-          next();
         } else {
           next();
         }
