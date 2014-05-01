@@ -43,7 +43,7 @@
       async.each(friends, function(follower_id, a_callback) {
         return account.createFollowerIfNotExists(follower_id, steps.finished, a_callback);
       });
-      return callback(null, "done");
+      return callback("done");
     }
   ], function(err, result) {
     if (err) {
@@ -56,13 +56,13 @@
     account.sent_in_interval = 0;
     async.each([steps.dm4_replyed, steps.dm3_replyed, steps.dm2_replyed, steps.dm1_replyed, steps.followed], function(step, callback) {
       var message;
-      message = void 0;
+      message = "";
       messages.forEach(function(mes) {
-        if (mes["step"] === step) {
+        if (parseInt(mes["step"]) === parseInt(step)) {
           return message = mes["message"];
         }
       });
-      return account.sendDirectMessages(step, message, callback);
+      account.sendDirectMessages(step, message, callback);
     });
     async.waterfall([
       function(callback) {
@@ -87,7 +87,7 @@
         async.each(friends, function(follower_id, a_callback) {
           return account.createFollowerIfNotExists(follower_id, steps.followed, a_callback);
         });
-        return callback(null, "done");
+        return callback("done");
       }
     ], function(err, result) {
       if (err) {

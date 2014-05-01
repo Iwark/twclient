@@ -53,11 +53,12 @@ main = () ->
     steps.followed
   ], (step, callback) ->
     # 送信するメッセージ
-    message = undefined
+    message = ""
     messages.forEach (mes) ->
-      if mes["step"] is step
+      if parseInt(mes["step"]) is parseInt(step)
         message = mes["message"]
     account.sendDirectMessages step, message, callback
+    return
 
   # DMの検出
   async.waterfall [

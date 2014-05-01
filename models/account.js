@@ -146,6 +146,7 @@
         step: step
       }, function(err, followers) {
         if (!err && followers && followers.length > 0) {
+          console.log("step" + step + " of followers.length = " + followers.length);
           async.each(followers, function(follower, callback) {
             if (this.sent_in_interval < MAX_NUM_OF_DM) {
               this.sent_in_interval++;
@@ -171,8 +172,11 @@
               callback();
             }
           });
+          next();
+        } else {
+          next();
         }
-        next();
+        console.log("sending direct messages: done.");
       });
     };
 
