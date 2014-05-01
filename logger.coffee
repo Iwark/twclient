@@ -13,17 +13,15 @@ smtpTransport = nodemailer.createTransport "SMTP",
 now = new Date()
 title = "TWclient Sever Log."
 
-logFile = fs.readFileSync('./twlog','utf-8')
-
-
-
-mailOptions = 
-    from: "twclient <iwark02@gmail.com>"
-    to: "iwark02@gmail.com, rzmrumgxx@gmail.com"
-    subject: title
-    text: logFile.toString()
-
 main = () ->
+
+    logFile = fs.readFileSync('./twlog','utf-8')
+
+    mailOptions = 
+        from: "twclient <iwark02@gmail.com>"
+        to: "iwark02@gmail.com, rzmrumgxx@gmail.com"
+        subject: title
+        text: logFile.toString()
 
     smtpTransport.sendMail mailOptions, (error, response) ->
         if(error)
