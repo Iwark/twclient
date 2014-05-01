@@ -142,21 +142,18 @@
     };
 
     Account.prototype.sendDirectMessages = function(step, message, next) {
-      console.log("mes");
-      console.log(this.T);
-      console.log(Twit);
+      var self;
+      self = this;
       return Follower.find({
         step: step
       }, function(err, followers) {
         if (!err && followers && followers.length > 0) {
           console.log("step" + step + " of followers.length = " + followers.length);
           async.each(followers, function(follower, callback) {
-            if (!this.sent_in_interval) {
-              this.sent_in_interval = 0;
-            }
-            if (this.sent_in_interval < MAX_NUM_OF_DM) {
-              this.sent_in_interval++;
-              this.T.post("direct_messages/new", {
+            console.log("self.sent_in_interval = " + self.sent_in_interval);
+            if (self.sent_in_interval < MAX_NUM_OF_DM) {
+              self.sent_in_interval++;
+              self.T.post("direct_messages/new", {
                 user_id: follower.follower_id,
                 text: message
               }, function(err, reply) {
@@ -176,7 +173,7 @@
                 }
               });
             } else {
-              console.log("exceeded the limit of sent_in_interval :" + this.sent_in_interval);
+              console.log("exceeded the limit of sent_in_interval :" + self.sent_in_interval);
               callback();
             }
           });

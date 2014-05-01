@@ -119,19 +119,17 @@ class Account
 
   # DMの送信
   sendDirectMessages: (step, message, next) ->
-    console.log "mes"
-    console.log @T
-    console.log Twit
+    self = this
     Follower.find
       step: step
     , (err, followers) ->
       if !err && followers && followers.length > 0
         console.log "step"+step+" of followers.length = "+followers.length
         async.each followers, (follower, callback) ->
-          @sent_in_interval = 0 if not @sent_in_interval
-          if @sent_in_interval < MAX_NUM_OF_DM
-            @sent_in_interval++
-            @T.post "direct_messages/new",
+          console.log "self.sent_in_interval = " + self.sent_in_interval
+          if self.sent_in_interval < MAX_NUM_OF_DM
+            self.sent_in_interval++
+            self.T.post "direct_messages/new",
               user_id: follower.follower_id
               text: message
             , (err, reply) ->
@@ -148,7 +146,7 @@ class Account
                 callback()
                 return
           else 
-            console.log "exceeded the limit of sent_in_interval :" + @sent_in_interval
+            console.log "exceeded the limit of sent_in_interval :" + self.sent_in_interval
             callback()
           return
         next()

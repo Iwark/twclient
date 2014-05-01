@@ -45,7 +45,6 @@ async.waterfall [
 
 #メインの繰り返し処理
 main = () ->
-  account = new Account accounts[2]
   # 送信待ちの段階にあるフォロワーへのDM送信
   account.sent_in_interval = 0
   async.each [
