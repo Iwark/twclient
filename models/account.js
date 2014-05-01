@@ -156,7 +156,6 @@
               }
             }
             if (!hit) {
-              printLog("did not hit any of steps: " + directMessage["sender_screen_name"] + " (" + follower.follower_id + ")");
               callback();
             }
           } else {
