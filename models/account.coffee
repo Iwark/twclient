@@ -72,6 +72,7 @@ class Account
           step: step
         )
         newFollower.save (err) -> 
+          printLog "found new Friend :" + follower_id
           next()
           return
       else 
@@ -81,20 +82,25 @@ class Account
 
   # DMの取得
   getDirectMessages: (next) ->
+    self = this
     param =
       include_entities: false
       skip_status: true
       since_id: @last_sent_dm_id
     @T.get "direct_messages", param, (err, directMessages) ->
       if !err && directMessages && directMessages.length > 0
-        @last_sent_dm_id = directMessages[0]["id"]
-        @direct_messages = directMessages;
-        next null, @direct_messages
-        return
+        self.last_sent_dm_id = directMessages[0]["id"]
+        self.direct_messages = directMessages;
+        next null, directMessages
+      else
+        printLog "no new direct_messages found."
+        next null, []
+      return
     return
 
   # 該当するフォロワーの段階を１段階上げる
   stepUpFollower: (direct_messages, steps, next) ->
+    printLog "trying to step up " + direct_messages.length + " direct_messages..."
     async.each direct_messages, (directMessage, callback) ->
       Follower.findOne
         follower_id: directMessage["sender_id"]
@@ -102,12 +108,13 @@ class Account
         if !err && follower
           hit = false
           for step of steps
-            if follower.step is step
+            if parseInt(follower.step) is parseInt(step)
               hit = true
               if follower.last_sent_at
                 lastDate = follower.last_sent_at
                 createdDate = new Date(directMessage["created_at"])
                 callback() if createdDate - lastDate <= 3
+                return
               follower.step++
               follower.screen_name = directMessage["sender_screen_name"]
               follower.messages.push(directMessage["text"]) if directMessage["text"]
@@ -120,6 +127,7 @@ class Account
                 return
               break
           if !hit
+            printLog "did not hit any of steps: " + follower.step + " (" + follower.follower_id + ")"
             callback()
             return
         else

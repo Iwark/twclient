@@ -86,6 +86,7 @@
             step: step
           });
           return newFollower.save(function(err) {
+            printLog("found new Friend :" + follower_id);
             next();
           });
         } else {
@@ -95,7 +96,8 @@
     };
 
     Account.prototype.getDirectMessages = function(next) {
-      var param;
+      var param, self;
+      self = this;
       param = {
         include_entities: false,
         skip_status: true,
@@ -103,14 +105,18 @@
       };
       this.T.get("direct_messages", param, function(err, directMessages) {
         if (!err && directMessages && directMessages.length > 0) {
-          this.last_sent_dm_id = directMessages[0]["id"];
-          this.direct_messages = directMessages;
-          next(null, this.direct_messages);
+          self.last_sent_dm_id = directMessages[0]["id"];
+          self.direct_messages = directMessages;
+          next(null, directMessages);
+        } else {
+          printLog("no new direct_messages found.");
+          next(null, []);
         }
       });
     };
 
     Account.prototype.stepUpFollower = function(direct_messages, steps, next) {
+      printLog("trying to step up " + direct_messages.length + " direct_messages...");
       async.each(direct_messages, function(directMessage, callback) {
         return Follower.findOne({
           follower_id: directMessage["sender_id"]
@@ -119,7 +125,7 @@
           if (!err && follower) {
             hit = false;
             for (step in steps) {
-              if (follower.step === step) {
+              if (parseInt(follower.step) === parseInt(step)) {
                 hit = true;
                 if (follower.last_sent_at) {
                   lastDate = follower.last_sent_at;
@@ -127,6 +133,7 @@
                   if (createdDate - lastDate <= 3) {
                     callback();
                   }
+                  return;
                 }
                 follower.step++;
                 follower.screen_name = directMessage["sender_screen_name"];
@@ -148,6 +155,7 @@
               }
             }
             if (!hit) {
+              printLog("did not hit any of steps: " + follower.step + " (" + follower.follower_id + ")");
               callback();
             }
           } else {
