@@ -98,7 +98,7 @@
     Account.prototype.getDirectMessages = function(next) {
       var self;
       self = this;
-      async.each([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], function(page, callback) {
+      async.each([1, 2, 3], function(page, callback) {
         var param;
         param = {
           include_entities: false,
@@ -169,13 +169,18 @@
     };
 
     Account.prototype.sendDirectMessages = function(step, message, next) {
-      var self;
+      var self, stop;
       self = this;
+      stop = false;
       return Follower.find({
         step: step
       }, function(err, followers) {
         if (!err && followers && followers.length > 0) {
           async.each(followers, function(follower, callback) {
+            if (stop) {
+              callback();
+              return;
+            }
             if (self.sent_in_interval < MAX_NUM_OF_DM) {
               self.sent_in_interval++;
               self.T.post("direct_messages/new", {
@@ -195,8 +200,9 @@
                     callback();
                   });
                 } else {
-                  printLog("an error occuerd : " + err + ":" + reply);
+                  printLog("an error occuerd while sending direct message : " + err);
                   callback();
+                  stop = true;
                 }
               });
             } else {

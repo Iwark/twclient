@@ -83,7 +83,7 @@ class Account
   # DMの取得
   getDirectMessages: (next) ->
     self = this
-    async.each [1..10], (page, callback) ->
+    async.each [1..3], (page, callback) ->
       param =
         include_entities: false
         skip_status: true
@@ -142,11 +142,15 @@ class Account
   # DMの送信
   sendDirectMessages: (step, message, next) ->
     self = this
+    stop = false
     Follower.find
       step: step
     , (err, followers) ->
       if !err && followers && followers.length > 0
         async.each followers, (follower, callback) ->
+          if stop
+            callback()
+            return
           if self.sent_in_interval < MAX_NUM_OF_DM
             self.sent_in_interval++
             self.T.post "direct_messages/new",
@@ -164,8 +168,9 @@ class Account
                   callback()
                   return
               else 
-                printLog "an error occuerd : " + err + ":" + reply
+                printLog "an error occuerd while sending direct message : " + err
                 callback()
+                stop = true
                 return
           else 
             printLog "exceeded the limit of sent_in_interval :" + self.sent_in_interval
