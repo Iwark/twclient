@@ -204,9 +204,6 @@
                   printLog("an error occuerd while sending direct message: " + err);
                   callback();
                   unfollowing_test = /who are not following/i.test(err);
-                  if (unfollowing_test) {
-                    self.createFriendShip(follower.follower_id);
-                  }
                   suspended_test = /suspended/i.test(err);
                   if (suspended_test) {
                     stop = true;

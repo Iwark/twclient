@@ -171,7 +171,7 @@ class Account
                 printLog "an error occuerd while sending direct message: " + err
                 callback()
                 unfollowing_test = /who are not following/i.test(err)
-                self.createFriendShip(follower.follower_id) if unfollowing_test
+                # self.createFriendShip(follower.follower_id) if unfollowing_test
                 suspended_test = /suspended/i.test(err)
                 stop = true if suspended_test
                 return
