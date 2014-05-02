@@ -25,7 +25,7 @@ messages = yaml.load(fs.readFileSync('./config/messages.yml','utf-8'))
 steps = yaml.load(fs.readFileSync('./config/steps.yml','utf-8'))
 
 Account = require "./models/account"
-account = new Account(accounts[2])
+account = new Account(accounts[0])
 
 # 処理の繰り返し間隔
 INTERVAL = 15 * 60 * 1000 #15分

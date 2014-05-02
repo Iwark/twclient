@@ -27,6 +27,8 @@
   };
 
   Account = (function() {
+    var createFriendShip;
+
     function Account(account) {
       this.T = new Twit(account);
       this.screen_name = account.screen_name;
@@ -187,6 +189,7 @@
                 user_id: follower.follower_id,
                 text: message
               }, function(err, reply) {
+                var suspended_test, unfollowing_test;
                 if (!err && reply) {
                   follower.step++;
                   follower.screen_name = reply["recipient_screen_name"];
@@ -200,9 +203,16 @@
                     callback();
                   });
                 } else {
-                  printLog("an error occuerd while sending direct message : " + err);
+                  printLog("an error occuerd while sending direct message: " + err);
                   callback();
-                  stop = true;
+                  unfollowing_test = /who are not following/i.test(err);
+                  if (unfollowing_test) {
+                    self.createFriendShip(follower.follower_id);
+                  }
+                  suspended_test = /suspended/i.test(err);
+                  if (suspended_test) {
+                    stop = true;
+                  }
                 }
               });
             } else {
@@ -214,6 +224,18 @@
           });
         } else {
           next();
+        }
+      });
+    };
+
+    createFriendShip = function(follower_id) {
+      this.T.post("friendships/create", {
+        user_id: follower_id
+      }, function(err, reply) {
+        if (err) {
+          printLog("an error occuerd while creating friendship: " + err);
+        } else {
+          printLog("created new friend ship: " + reply["name"] + "(" + reply["id_str"] + ")");
         }
       });
     };

@@ -168,9 +168,12 @@ class Account
                   callback()
                   return
               else 
-                printLog "an error occuerd while sending direct message : " + err
+                printLog "an error occuerd while sending direct message: " + err
                 callback()
-                stop = true
+                unfollowing_test = /who are not following/i.test(err)
+                self.createFriendShip(follower.follower_id) if unfollowing_test
+                suspended_test = /suspended/i.test(err)
+                stop = true if suspended_test
                 return
           else 
             printLog "exceeded the limit of sent_in_interval :" + self.sent_in_interval
@@ -183,4 +186,15 @@ class Account
         next()
       return
 
+  # sendFollow
+  createFriendShip = (follower_id) ->
+    @T.post "friendships/create",
+      user_id: follower_id
+    , (err, reply) ->
+      if err
+        printLog "an error occuerd while creating friendship: " + err
+      else
+        printLog "created new friend ship: " + reply["name"] + "(" + reply["id_str"] + ")"
+      return
+    return
 module.exports = Account
