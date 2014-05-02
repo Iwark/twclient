@@ -21,7 +21,7 @@
   title = "TWclient Sever Log.";
 
   main = function() {
-    var logFile, mailOptions;
+    var error, logFile, mailOptions;
     logFile = fs.readFileSync('./twlog', 'utf-8');
     mailOptions = {
       from: "twclient <iwark02@gmail.com>",
@@ -29,14 +29,19 @@
       subject: title,
       text: logFile.toString()
     };
-    return smtpTransport.sendMail(mailOptions, function(error, response) {
-      if (error) {
-        return console.log(error);
-      } else {
-        console.log("Message sent: " + response.message);
-        return fs.writeFileSync('./twlog', '');
-      }
-    });
+    try {
+      return smtpTransport.sendMail(mailOptions, function(error, response) {
+        if (error) {
+          return console.log(error);
+        } else {
+          console.log("Message sent: " + response.message);
+          return fs.writeFileSync('./twlog', '');
+        }
+      });
+    } catch (_error) {
+      error = _error;
+      return console.log(error);
+    }
   };
 
   main();

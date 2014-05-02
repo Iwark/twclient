@@ -22,13 +22,15 @@ main = () ->
         to: "iwark02@gmail.com, rzmrumgxx@gmail.com"
         subject: title
         text: logFile.toString()
-
-    smtpTransport.sendMail mailOptions, (error, response) ->
-        if(error)
-            console.log(error)
-        else
-            console.log("Message sent: " + response.message);
-            fs.writeFileSync('./twlog','')
+    try
+        smtpTransport.sendMail mailOptions, (error, response) ->
+            if(error)
+                console.log(error)
+            else
+                console.log("Message sent: " + response.message);
+                fs.writeFileSync('./twlog','')
+    catch error
+        console.log(error)
 
 # 初回待つのをやめる。
 main()
