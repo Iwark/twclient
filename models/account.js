@@ -27,8 +27,6 @@
   };
 
   Account = (function() {
-    var createFriendShip;
-
     function Account(account) {
       this.T = new Twit(account);
       this.screen_name = account.screen_name;
@@ -228,7 +226,7 @@
       });
     };
 
-    createFriendShip = function(follower_id) {
+    Account.prototype.createFriendShip = function(follower_id) {
       this.T.post("friendships/create", {
         user_id: follower_id
       }, function(err, reply) {

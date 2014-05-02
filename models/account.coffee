@@ -187,7 +187,7 @@ class Account
       return
 
   # sendFollow
-  createFriendShip = (follower_id) ->
+  createFriendShip: (follower_id) ->
     @T.post "friendships/create",
       user_id: follower_id
     , (err, reply) ->
