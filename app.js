@@ -40,7 +40,7 @@
 
   Account = require("./models/account");
 
-  account = new Account(accounts[0]);
+  account = new Account(accounts[2]);
 
   INTERVAL = 15 * 60 * 1000;
 
