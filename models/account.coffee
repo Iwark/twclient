@@ -169,14 +169,16 @@ class Account
                   return
               else 
                 printLog "an error occuerd while sending direct message: " + err
-                callback()
                 unfollowing_test = /who are not following/i.test(err)
                 # self.createFriendShip(follower.follower_id) if unfollowing_test
                 suspended_test = /suspended/i.test(err)
-                stop = true if suspended_test
+                exceeded_test = /lot to say/i.test(err)
+                stop = true if suspended_test || exceeded_test
+                callback()
                 return
           else 
             printLog "exceeded the limit of sent_in_interval :" + self.sent_in_interval
+            stop = true
             callback()
           return
         , (err) ->
