@@ -4,16 +4,16 @@ fs = require "fs"
 # 処理の繰り返し間隔
 INTERVAL = 60 * 60 * 1000 #60分
 
-smtpTransport = nodemailer.createTransport "SMTP",
-    service: "Gmail"
-    auth: 
-        user: "iwark02@gmail.com"
-        pass: "kouhei7y"
-
 now = new Date()
 title = "TWclient Sever Log."
 
 main = () ->
+
+    smtpTransport = nodemailer.createTransport "SMTP",
+    service: "Gmail"
+    auth: 
+        user: "iwark02@gmail.com"
+        pass: "kouhei7y"
 
     logFile = fs.readFileSync('./twlog','utf-8')
 
@@ -31,6 +31,8 @@ main = () ->
                 fs.writeFileSync('./twlog','')
     catch error
         console.log(error)
+
+    smtpTransport.close()
 
 # 初回待つのをやめる。
 main()
