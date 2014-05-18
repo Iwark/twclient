@@ -10,10 +10,10 @@ title = "TWclient Sever Log."
 main = () ->
 
     smtpTransport = nodemailer.createTransport "SMTP",
-    service: "Gmail"
-    auth: 
-        user: "iwark02@gmail.com"
-        pass: "kouhei7y"
+        service: "Gmail"
+        auth: 
+            user: "iwark02@gmail.com"
+            pass: "kouhei7y"
 
     logFile = fs.readFileSync('./twlog','utf-8')
 
