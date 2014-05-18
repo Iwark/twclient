@@ -24,13 +24,12 @@ main = () ->
         text: logFile.toString()
 
     smtpTransport.sendMail mailOptions, (error, response) ->
-            if(error)
-                console.log(error)
-            else
-                console.log("Message sent: " + response.message);
-                fs.writeFileSync('./twlog','')
-
-    smtpTransport.close()
+        if(error)
+            console.log(error)
+        else
+            console.log("Message sent: " + response.message);
+            fs.writeFileSync('./twlog','')
+        smtpTransport.close()
     return
 
 # 初回待つのをやめる。

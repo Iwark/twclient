@@ -30,13 +30,13 @@
     };
     smtpTransport.sendMail(mailOptions, function(error, response) {
       if (error) {
-        return console.log(error);
+        console.log(error);
       } else {
         console.log("Message sent: " + response.message);
-        return fs.writeFileSync('./twlog', '');
+        fs.writeFileSync('./twlog', '');
       }
+      return smtpTransport.close();
     });
-    smtpTransport.close();
   };
 
   main();
