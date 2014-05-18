@@ -11,28 +11,27 @@ main = () ->
 
     smtpTransport = nodemailer.createTransport "SMTP",
         service: "Gmail"
-        auth: 
+        auth:
             user: "iwark02@gmail.com"
             pass: "kouhei7y"
 
     logFile = fs.readFileSync('./twlog','utf-8')
 
-    mailOptions = 
+    mailOptions =
         from: "twclient <iwark02@gmail.com>"
         to: "iwark02@gmail.com, rzmrumgxx@gmail.com"
         subject: title
         text: logFile.toString()
-    try
-        smtpTransport.sendMail mailOptions, (error, response) ->
+
+    smtpTransport.sendMail mailOptions, (error, response) ->
             if(error)
                 console.log(error)
             else
                 console.log("Message sent: " + response.message);
                 fs.writeFileSync('./twlog','')
-    catch error
-        console.log(error)
 
     smtpTransport.close()
+    return
 
 # 初回待つのをやめる。
 main()

@@ -13,7 +13,7 @@
   title = "TWclient Sever Log.";
 
   main = function() {
-    var error, logFile, mailOptions, smtpTransport;
+    var logFile, mailOptions, smtpTransport;
     smtpTransport = nodemailer.createTransport("SMTP", {
       service: "Gmail",
       auth: {
@@ -28,20 +28,15 @@
       subject: title,
       text: logFile.toString()
     };
-    try {
-      smtpTransport.sendMail(mailOptions, function(error, response) {
-        if (error) {
-          return console.log(error);
-        } else {
-          console.log("Message sent: " + response.message);
-          return fs.writeFileSync('./twlog', '');
-        }
-      });
-    } catch (_error) {
-      error = _error;
-      console.log(error);
-    }
-    return smtpTransport.close();
+    smtpTransport.sendMail(mailOptions, function(error, response) {
+      if (error) {
+        return console.log(error);
+      } else {
+        console.log("Message sent: " + response.message);
+        return fs.writeFileSync('./twlog', '');
+      }
+    });
+    smtpTransport.close();
   };
 
   main();
