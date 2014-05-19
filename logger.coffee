@@ -2,7 +2,7 @@ nodemailer = require "nodemailer"
 fs = require "fs"
 
 # 処理の繰り返し間隔
-INTERVAL = 60 * 60 * 1000 #60分
+INTERVAL = 120 * 60 * 1000 # ２時間
 
 now = new Date()
 title = "TWclient Sever Log."
@@ -21,6 +21,7 @@ main = () ->
         from: "twclient <iwark02@gmail.com>"
         to: "iwark02@gmail.com, rzmrumgxx@gmail.com"
         subject: title
+        html: logFile.toString()
         text: logFile.toString()
 
     smtpTransport.sendMail mailOptions, (error, response) ->

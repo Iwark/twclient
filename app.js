@@ -1,5 +1,5 @@
 (function() {
-  var Account, INTERVAL, Twit, account, accounts, async, fs, key, main, messages, mongoose, printLog, schema, steps, yaml;
+  var Account, INTERVAL, Twit, account, accounts, async, fs, key, log, main, messages, mongoose, schema, steps, yaml;
 
   Twit = require("twit");
 
@@ -13,15 +13,7 @@
 
   require("date-utils");
 
-  printLog = function(content) {
-    var date, logData, logFile;
-    logFile = fs.readFileSync("./twlog", "utf-8");
-    date = new Date();
-    date = date.toFormat("MM/DD HH24:MI:SS");
-    logData = "[" + date + "] " + content + "\n";
-    fs.appendFileSync("./twlog", logData);
-    return console.log(logData);
-  };
+  log = require("../libs/print-log.js");
 
   schema = require("./db/schema.js");
 
@@ -59,7 +51,7 @@
     }
   ], function(err, result) {
     if (err) {
-      return printLog(err);
+      log.warn("Step99 Error: " + err);
     }
   });
 
@@ -83,7 +75,7 @@
         }
       ], function(err, result) {
         if (err) {
-          printLog(err);
+          log.warn("DMFind Error: " + err);
         }
       });
       return async.waterfall([
@@ -102,7 +94,7 @@
         }
       ], function(err, result) {
         if (err) {
-          return printLog(err);
+          return log.warn("RefollowFind Error: " + err);
         }
       });
     });

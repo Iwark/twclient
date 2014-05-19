@@ -5,7 +5,7 @@
 
   fs = require("fs");
 
-  INTERVAL = 60 * 60 * 1000;
+  INTERVAL = 120 * 60 * 1000;
 
   now = new Date();
 
@@ -25,6 +25,7 @@
       from: "twclient <iwark02@gmail.com>",
       to: "iwark02@gmail.com, rzmrumgxx@gmail.com",
       subject: title,
+      html: logFile.toString(),
       text: logFile.toString()
     };
     smtpTransport.sendMail(mailOptions, function(error, response) {

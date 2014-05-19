@@ -8,13 +8,7 @@ Follower = mongoose.model("Follower")
 # 15分間に送信するメッセージの最大数
 MAX_NUM_OF_DM = 10
 
-printLog = (content) ->
-  logFile = fs.readFileSync "./twlog", "utf-8"
-  date = new Date()
-  date = date.toFormat("MM/DD HH24:MI:SS")
-  logData = "[" + date + "] " + content + "\n"
-  fs.appendFileSync "./twlog", logData
-  console.log logData
+log = require "../libs/print-log.js"
 
 class Account
   # 初期化処理
@@ -71,8 +65,8 @@ class Account
           step: step
         )
         newFollower.save (err) -> 
-          printLog "found new Friend :" + follower_id
-          printLog "follower " + newFollower.follower_id + " step up: " + (newFollower.step-1) + " -> " + newFollower.step
+          log.info "found new Friend :" + follower_id
+          log.info "follower " + newFollower.follower_id + " step up: " + (newFollower.step-1) + " -> " + newFollower.step
           next()
           return
       else 
@@ -99,6 +93,22 @@ class Account
       return
     return
 
+  # 指定した段階に変更する
+  stepChangeFollower: (follower_id, step) ->
+    Follower.findOne
+      follower_id: follower_id
+    , (err, follower) ->
+      pre_step = follower.step
+      follower.step = step
+      follower.save (err) ->
+        log.warn "StepChange Error: " + err if err
+        log.info "StepChange: " + follower.screen_name + "(" + follower.follower_id + ")" + " step changed: " + (pre_step) + " -> " + follower.step
+        return
+    , (err) ->
+      next err, "done"
+      return
+    return
+
   # 該当するフォロワーの段階を１段階上げる
   stepUpFollower: (direct_messages, steps, next) ->
     async.each direct_messages, (directMessage, callback) ->
@@ -118,9 +128,9 @@ class Account
                 follower.messages.push(directMessage["text"]) if directMessage["text"]
                 follower.last_sent_at = new Date(directMessage["created_at"])
                 follower.save (err) ->
-                  printLog err  if err
-                  printLog "got new message from " + follower.screen_name + "(" + follower.follower_id + ") : " + directMessage["text"] if directMessage["text"]
-                  printLog "follower " + follower.screen_name + "(" + follower.follower_id + ")" + " step up: " + (follower.step-1) + " -> " + follower.step
+                  log.warn "FollowerSave Error: "  if err
+                  log.info "New Message: " + follower.screen_name + "(" + follower.follower_id + ") : " + directMessage["text"] if directMessage["text"]
+                  log.info "Follower " + follower.screen_name + "(" + follower.follower_id + ")" + " step up: " + (follower.step-1) + " -> " + follower.step
                   callback()
                   return
                 break
@@ -129,9 +139,9 @@ class Account
             return
         else
           if err
-            printLog "err: " + err
+            log.warn "FollowerFind Error: " + err
           else
-            printLog "not found the follower: " + directMessage["sender_screen_name"] + " (" + directMessage["sender_id"] + ")"
+            log.warn "Follower NotFound: " + directMessage["sender_screen_name"] + " (" + directMessage["sender_id"] + ")"
           callback()
           return
     , (err) ->
@@ -162,14 +172,15 @@ class Account
                 follower.screen_name = reply["recipient_screen_name"]
                 follower.last_sent_at = new Date()
                 follower.save (err) ->
-                  printLog err  if err
-                  printLog "step" + step + " DM sent to " + reply["recipient_screen_name"] + "(" + reply["recipient_id"] + ")"
-                  printLog "follower " + follower.screen_name + "(" + follower.follower_id + ")" + " step up: " + (follower.step-1) + " -> " + follower.step
+                  log.warn "FollowerSave Error: "  if err
+                  log.info "step" + step + " DM sent to " + reply["recipient_screen_name"] + "(" + reply["recipient_id"] + ")"
+                  log.info "follower " + follower.screen_name + "(" + follower.follower_id + ")" + " step up: " + (follower.step-1) + " -> " + follower.step
                   callback()
                   return
               else 
-                printLog "an error occuerd while sending direct message: " + err
+                log.error "Send Error: " + err
                 unfollowing_test = /who are not following/i.test(err)
+                self.stepChangeFollower(follower.follower_id, 99) if unfollowing_test
                 # self.createFriendShip(follower.follower_id) if unfollowing_test
                 suspended_test = /suspended/i.test(err)
                 exceeded_test = /lot to say/i.test(err)
@@ -177,7 +188,7 @@ class Account
                 callback()
                 return
           else 
-            printLog "exceeded the limit of sent_in_interval :" + self.sent_in_interval
+            log.warn "exceeded the limit of sent_in_interval :" + self.sent_in_interval
             stop = true
             callback()
           return
@@ -194,9 +205,9 @@ class Account
       user_id: follower_id
     , (err, reply) ->
       if err
-        printLog "an error occuerd while creating friendship: " + err
+        log.error "an error occuerd while creating friendship: " + err
       else
-        printLog "created new friend ship: " + reply["name"] + "(" + reply["id_str"] + ")"
+        log.info "created new friend ship: " + reply["name"] + "(" + reply["id_str"] + ")"
       return
     return
 module.exports = Account

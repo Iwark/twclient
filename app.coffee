@@ -5,13 +5,7 @@ async = require "async"
 yaml = require "js-yaml"
 require "date-utils"
 
-printLog = (content) ->
-  logFile = fs.readFileSync "./twlog", "utf-8"
-  date = new Date()
-  date = date.toFormat("MM/DD HH24:MI:SS")
-  logData = "[" + date + "] " + content + "\n"
-  fs.appendFileSync "./twlog", logData
-  console.log logData
+log = require "../libs/print-log.js"
 
 schema = require "./db/schema.js"
 
@@ -50,7 +44,8 @@ async.waterfall [
     , (err) ->
       callback null, "done"
 ], (err, result) ->
-  printLog err  if err
+  log.warn "Step99 Error: " +err  if err
+  return
 
 #メインの繰り返し処理
 main = () ->
@@ -93,7 +88,7 @@ main = () ->
         return
 
     ], (err, result) ->
-      printLog err  if err
+      log.warn "DMFind Error: " + err if err
       return
 
     # リフォローの検出
@@ -115,7 +110,7 @@ main = () ->
         , (err) ->
           callback err, "done"
     ], (err, result) ->
-      printLog err  if err
+      log.warn "RefollowFind Error: " + err  if err
 
 # 初回15分待つのをやめる。
 main()

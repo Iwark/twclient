@@ -1,5 +1,5 @@
 (function() {
-  var Account, Follower, MAX_NUM_OF_DM, Twit, async, fs, mongoose, printLog;
+  var Account, Follower, MAX_NUM_OF_DM, Twit, async, fs, log, mongoose;
 
   Twit = require("twit");
 
@@ -15,15 +15,7 @@
 
   MAX_NUM_OF_DM = 10;
 
-  printLog = function(content) {
-    var date, logData, logFile;
-    logFile = fs.readFileSync("./twlog", "utf-8");
-    date = new Date();
-    date = date.toFormat("MM/DD HH24:MI:SS");
-    logData = "[" + date + "] " + content + "\n";
-    fs.appendFileSync("./twlog", logData);
-    return console.log(logData);
-  };
+  log = require("../libs/print-log.js");
 
   Account = (function() {
     function Account(account) {
@@ -84,8 +76,8 @@
             step: step
           });
           return newFollower.save(function(err) {
-            printLog("found new Friend :" + follower_id);
-            printLog("follower " + newFollower.follower_id + " step up: " + (newFollower.step - 1) + " -> " + newFollower.step);
+            log.info("found new Friend :" + follower_id);
+            log.info("follower " + newFollower.follower_id + " step up: " + (newFollower.step - 1) + " -> " + newFollower.step);
             next();
           });
         } else {
@@ -115,6 +107,24 @@
       });
     };
 
+    Account.prototype.stepChangeFollower = function(follower_id, step) {
+      Follower.findOne({
+        follower_id: follower_id
+      }, function(err, follower) {
+        var pre_step;
+        pre_step = follower.step;
+        follower.step = step;
+        return follower.save(function(err) {
+          if (err) {
+            log.warn("StepChange Error: " + err);
+          }
+          log.info("StepChange: " + follower.screen_name + "(" + follower.follower_id + ")" + " step changed: " + pre_step + " -> " + follower.step);
+        });
+      }, function(err) {
+        next(err, "done");
+      });
+    };
+
     Account.prototype.stepUpFollower = function(direct_messages, steps, next) {
       async.each(direct_messages, function(directMessage, callback) {
         return Follower.findOne({
@@ -138,12 +148,12 @@
                   follower.last_sent_at = new Date(directMessage["created_at"]);
                   follower.save(function(err) {
                     if (err) {
-                      printLog(err);
+                      log.warn("FollowerSave Error: ");
                     }
                     if (directMessage["text"]) {
-                      printLog("got new message from " + follower.screen_name + "(" + follower.follower_id + ") : " + directMessage["text"]);
+                      log.info("New Message: " + follower.screen_name + "(" + follower.follower_id + ") : " + directMessage["text"]);
                     }
-                    printLog("follower " + follower.screen_name + "(" + follower.follower_id + ")" + " step up: " + (follower.step - 1) + " -> " + follower.step);
+                    log.info("Follower " + follower.screen_name + "(" + follower.follower_id + ")" + " step up: " + (follower.step - 1) + " -> " + follower.step);
                     callback();
                   });
                   break;
@@ -155,9 +165,9 @@
             }
           } else {
             if (err) {
-              printLog("err: " + err);
+              log.warn("FollowerFind Error: " + err);
             } else {
-              printLog("not found the follower: " + directMessage["sender_screen_name"] + " (" + directMessage["sender_id"] + ")");
+              log.warn("Follower NotFound: " + directMessage["sender_screen_name"] + " (" + directMessage["sender_id"] + ")");
             }
             callback();
           }
@@ -193,15 +203,18 @@
                   follower.last_sent_at = new Date();
                   return follower.save(function(err) {
                     if (err) {
-                      printLog(err);
+                      log.warn("FollowerSave Error: ");
                     }
-                    printLog("step" + step + " DM sent to " + reply["recipient_screen_name"] + "(" + reply["recipient_id"] + ")");
-                    printLog("follower " + follower.screen_name + "(" + follower.follower_id + ")" + " step up: " + (follower.step - 1) + " -> " + follower.step);
+                    log.info("step" + step + " DM sent to " + reply["recipient_screen_name"] + "(" + reply["recipient_id"] + ")");
+                    log.info("follower " + follower.screen_name + "(" + follower.follower_id + ")" + " step up: " + (follower.step - 1) + " -> " + follower.step);
                     callback();
                   });
                 } else {
-                  printLog("an error occuerd while sending direct message: " + err);
+                  log.error("Send Error: " + err);
                   unfollowing_test = /who are not following/i.test(err);
+                  if (unfollowing_test) {
+                    self.stepChangeFollower(follower.follower_id, 99);
+                  }
                   suspended_test = /suspended/i.test(err);
                   exceeded_test = /lot to say/i.test(err);
                   if (suspended_test || exceeded_test) {
@@ -211,7 +224,7 @@
                 }
               });
             } else {
-              printLog("exceeded the limit of sent_in_interval :" + self.sent_in_interval);
+              log.warn("exceeded the limit of sent_in_interval :" + self.sent_in_interval);
               stop = true;
               callback();
             }
@@ -229,9 +242,9 @@
         user_id: follower_id
       }, function(err, reply) {
         if (err) {
-          printLog("an error occuerd while creating friendship: " + err);
+          log.error("an error occuerd while creating friendship: " + err);
         } else {
-          printLog("created new friend ship: " + reply["name"] + "(" + reply["id_str"] + ")");
+          log.info("created new friend ship: " + reply["name"] + "(" + reply["id_str"] + ")");
         }
       });
     };
