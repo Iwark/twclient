@@ -95,6 +95,7 @@ class Account
 
   # 指定した段階に変更する
   stepChangeFollower: (follower_id, step) ->
+    follower_id = follower_id.toString()
     Follower.findOne
       follower_id: follower_id
     , (err, follower) ->
@@ -180,7 +181,7 @@ class Account
               else 
                 log.error "Send Error: " + err
                 unfollowing_test = /who are not following/i.test(err)
-                console.log "follower_id :" + follower.follower_id.toString()
+                console.log "follower_id: " + follower.follower_id.toString()
                 self.stepChangeFollower(follower.follower_id.toString(), 99) if unfollowing_test
                 # self.createFriendShip(follower.follower_id) if unfollowing_test
                 suspended_test = /suspended/i.test(err)

@@ -108,6 +108,7 @@
     };
 
     Account.prototype.stepChangeFollower = function(follower_id, step) {
+      follower_id = follower_id.toString();
       Follower.findOne({
         follower_id: follower_id
       }, function(err, follower) {
@@ -212,7 +213,7 @@
                 } else {
                   log.error("Send Error: " + err);
                   unfollowing_test = /who are not following/i.test(err);
-                  console.log("follower_id :" + follower.follower_id.toString());
+                  console.log("follower_id: " + follower.follower_id.toString());
                   if (unfollowing_test) {
                     self.stepChangeFollower(follower.follower_id.toString(), 99);
                   }
