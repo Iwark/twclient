@@ -95,18 +95,18 @@ class Account
 
   # 指定した段階に変更する
   stepChangeFollower: (follower_id, step) ->
-    follower_id = follower_id.toString()
     Follower.findOne
       follower_id: follower_id
     , (err, follower) ->
-      pre_step = follower.step
-      follower.step = step
-      follower.save (err) ->
-        log.warn "StepChange Error: " + err if err
-        log.info "StepChange: " + follower.screen_name + "(" + follower.follower_id + ")" + " step changed: " + (pre_step) + " -> " + follower.step
-        return
-    , (err) ->
-      next err, "done"
+      if err
+        log.error "FollowerFind Error: " + err
+      else
+        pre_step = follower.step
+        follower.step = step
+        follower.save (err) ->
+          log.warn "StepChange Error: " + err if err
+          log.info "StepChange: " + follower.screen_name + "(" + follower.follower_id + ")" + " step changed: " + (pre_step) + " -> " + follower.step
+          return
       return
     return
 
@@ -129,7 +129,7 @@ class Account
                 follower.messages.push(directMessage["text"]) if directMessage["text"]
                 follower.last_sent_at = new Date(directMessage["created_at"])
                 follower.save (err) ->
-                  log.warn "FollowerSave Error: "  if err
+                  log.warn "FollowerSave Error: " + err if err
                   log.info "New Message: " + follower.screen_name + "(" + follower.follower_id + ") : " + directMessage["text"] if directMessage["text"]
                   log.info "Follower " + follower.screen_name + "(" + follower.follower_id + ")" + " step up: " + (follower.step-1) + " -> " + follower.step
                   callback()
@@ -181,8 +181,7 @@ class Account
               else 
                 log.error "Send Error: " + err
                 unfollowing_test = /who are not following/i.test(err)
-                console.log "follower_id: " + follower.follower_id.toString()
-                self.stepChangeFollower(follower.follower_id.toString(), 99) if unfollowing_test
+                self.stepChangeFollower(follower.follower_id, 99) if unfollowing_test
                 # self.createFriendShip(follower.follower_id) if unfollowing_test
                 suspended_test = /suspended/i.test(err)
                 exceeded_test = /lot to say/i.test(err)

@@ -108,21 +108,22 @@
     };
 
     Account.prototype.stepChangeFollower = function(follower_id, step) {
-      follower_id = follower_id.toString();
       Follower.findOne({
         follower_id: follower_id
       }, function(err, follower) {
         var pre_step;
-        pre_step = follower.step;
-        follower.step = step;
-        return follower.save(function(err) {
-          if (err) {
-            log.warn("StepChange Error: " + err);
-          }
-          log.info("StepChange: " + follower.screen_name + "(" + follower.follower_id + ")" + " step changed: " + pre_step + " -> " + follower.step);
-        });
-      }, function(err) {
-        next(err, "done");
+        if (err) {
+          log.error("FollowerFind Error: " + err);
+        } else {
+          pre_step = follower.step;
+          follower.step = step;
+          follower.save(function(err) {
+            if (err) {
+              log.warn("StepChange Error: " + err);
+            }
+            log.info("StepChange: " + follower.screen_name + "(" + follower.follower_id + ")" + " step changed: " + pre_step + " -> " + follower.step);
+          });
+        }
       });
     };
 
@@ -149,7 +150,7 @@
                   follower.last_sent_at = new Date(directMessage["created_at"]);
                   follower.save(function(err) {
                     if (err) {
-                      log.warn("FollowerSave Error: ");
+                      log.warn("FollowerSave Error: " + err);
                     }
                     if (directMessage["text"]) {
                       log.info("New Message: " + follower.screen_name + "(" + follower.follower_id + ") : " + directMessage["text"]);
@@ -213,9 +214,8 @@
                 } else {
                   log.error("Send Error: " + err);
                   unfollowing_test = /who are not following/i.test(err);
-                  console.log("follower_id: " + follower.follower_id.toString());
                   if (unfollowing_test) {
-                    self.stepChangeFollower(follower.follower_id.toString(), 99);
+                    self.stepChangeFollower(follower.follower_id, 99);
                   }
                   suspended_test = /suspended/i.test(err);
                   exceeded_test = /lot to say/i.test(err);
