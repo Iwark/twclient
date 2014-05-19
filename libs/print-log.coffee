@@ -2,11 +2,11 @@ require "date-utils"
 fs = require "fs"
 
 printLog = (content) ->
-	logFile = fs.readFileSync "./log", "utf-8"
+	logFile = fs.readFileSync "./twlog", "utf-8"
 	date = new Date()
 	date = date.toFormat("MM/DD HH24:MI:SS")
 	logData = "[" + date + "] " + content + "\n"
-	fs.appendFileSync "./log", logData
+	fs.appendFileSync "./twlog", logData
 	console.log logData
 
 module.exports =

@@ -7,11 +7,11 @@
 
   printLog = function(content) {
     var date, logData, logFile;
-    logFile = fs.readFileSync("./log", "utf-8");
+    logFile = fs.readFileSync("./twlog", "utf-8");
     date = new Date();
     date = date.toFormat("MM/DD HH24:MI:SS");
     logData = "[" + date + "] " + content + "\n";
-    fs.appendFileSync("./log", logData);
+    fs.appendFileSync("./twlog", logData);
     return console.log(logData);
   };
 
