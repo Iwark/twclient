@@ -212,6 +212,7 @@
                 } else {
                   log.error("Send Error: " + err);
                   unfollowing_test = /who are not following/i.test(err);
+                  console.log("follower_id :" + follower.follower_id.toString());
                   if (unfollowing_test) {
                     self.stepChangeFollower(follower.follower_id.toString(), 99);
                   }

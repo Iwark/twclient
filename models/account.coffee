@@ -180,6 +180,7 @@ class Account
               else 
                 log.error "Send Error: " + err
                 unfollowing_test = /who are not following/i.test(err)
+                console.log "follower_id :" + follower.follower_id.toString()
                 self.stepChangeFollower(follower.follower_id.toString(), 99) if unfollowing_test
                 # self.createFriendShip(follower.follower_id) if unfollowing_test
                 suspended_test = /suspended/i.test(err)
