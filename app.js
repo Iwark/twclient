@@ -13,7 +13,7 @@
 
   require("date-utils");
 
-  log = require("libs/print-log.js");
+  log = require("./libs/print-log.js");
 
   schema = require("./db/schema.js");
 
