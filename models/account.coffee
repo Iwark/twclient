@@ -66,7 +66,7 @@ class Account
         )
         newFollower.save (err) -> 
           log.info "found new Friend :" + follower_id
-          log.info "follower " + newFollower.follower_id + " step up: " + (newFollower.step-1) + " -> " + newFollower.step
+          log.info "StepUp: (" + newFollower.follower_id + ") " + (newFollower.step-1) + " -> " + newFollower.step
           next()
           return
       else 
@@ -131,7 +131,7 @@ class Account
                 follower.save (err) ->
                   log.warn "FollowerSave Error: " + err if err
                   log.info "New Message: " + follower.screen_name + "(" + follower.follower_id + ") : " + directMessage["text"] if directMessage["text"]
-                  log.info "Follower " + follower.screen_name + "(" + follower.follower_id + ")" + " step up: " + (follower.step-1) + " -> " + follower.step
+                  log.info "StepUp: " + follower.screen_name + "(" + follower.follower_id + ") " + (follower.step-1) + " -> " + follower.step
                   callback()
                   return
                 break
@@ -174,8 +174,8 @@ class Account
                 follower.last_sent_at = new Date()
                 follower.save (err) ->
                   log.warn "FollowerSave Error: "  if err
-                  log.info "step" + step + " DM sent to " + reply["recipient_screen_name"] + "(" + reply["recipient_id"] + ")"
-                  log.info "follower " + follower.screen_name + "(" + follower.follower_id + ")" + " step up: " + (follower.step-1) + " -> " + follower.step
+                  log.info "DMSent" + step + ": " + reply["recipient_screen_name"] + "(" + reply["recipient_id"] + ")"
+                  log.info "StepUp: " + follower.screen_name + "(" + follower.follower_id + ") " + (follower.step-1) + " -> " + follower.step
                   callback()
                   return
               else 

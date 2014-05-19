@@ -17,14 +17,15 @@
 
   module.exports = {
     info: function(content) {
+      content = "<div>" + content + "</div>";
       printLog(content);
     },
     warn: function(content) {
-      content = "<span style='color: #f4be00;'>" + content + "</span>";
+      content = "<div style='color: #f4be00;'>" + content + "</div>";
       printLog(content);
     },
     error: function(content) {
-      content = "<span style='color: #db1921;'>" + content + "</span>";
+      content = "<div style='color: #db1921;'>" + content + "</div>";
       printLog(content);
     }
   };
