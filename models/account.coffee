@@ -181,7 +181,8 @@ class Account
               else 
                 log.error "Send Error: " + err
                 unfollowing_test = /who are not following/i.test(err)
-                self.stepChangeFollower(follower.follower_id, 99) if unfollowing_test
+                rightnow_test = /send direct messages to this user right now./i.test(err)
+                self.stepChangeFollower(follower.follower_id, 99) if unfollowing_test || rightnow_test
                 # self.createFriendShip(follower.follower_id) if unfollowing_test
                 suspended_test = /suspended/i.test(err)
                 exceeded_test = /lot to say/i.test(err)

@@ -198,7 +198,7 @@
                 user_id: follower.follower_id,
                 text: message
               }, function(err, reply) {
-                var exceeded_test, suspended_test, unfollowing_test;
+                var exceeded_test, rightnow_test, suspended_test, unfollowing_test;
                 if (!err && reply) {
                   follower.step++;
                   follower.screen_name = reply["recipient_screen_name"];
@@ -214,7 +214,8 @@
                 } else {
                   log.error("Send Error: " + err);
                   unfollowing_test = /who are not following/i.test(err);
-                  if (unfollowing_test) {
+                  rightnow_test = /send direct messages to this user right now./i.test(err);
+                  if (unfollowing_test || rightnow_test) {
                     self.stepChangeFollower(follower.follower_id, 99);
                   }
                   suspended_test = /suspended/i.test(err);
