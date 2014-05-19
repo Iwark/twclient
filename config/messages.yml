@@ -10,5 +10,5 @@
 - step: 7 # dm3_replyed
   message: こっちに友達いなさすぎてちょー寂しいんだよね>_<  よかったらLINEしよーよ(´∀｀艸)  http://line.naver.jp/ti/p/D1d4gILRfU
 
-- step: 9 # dm4_replyed
-  message: てか、LINEしよーよ*\(^o^)/* http://line.naver.jp/ti/p/ThI-12pukm これ押したら追加できるやつだからさ（≧∇≦）
+# - step: 9 # dm4_replyed
+#   message: てか、LINEしよーよ*\(^o^)/* http://line.naver.jp/ti/p/ThI-12pukm これ押したら追加できるやつだからさ（≧∇≦）

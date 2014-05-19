@@ -57,8 +57,10 @@ main = () ->
   # 送信待ちの段階にあるフォロワーへのDM送信
   account.sent_in_interval = 0
   async.each [
-    steps.dm4_replyed, steps.dm3_replyed
-    steps.dm2_replyed, steps.dm1_replyed
+    # steps.dm4_replyed
+    steps.dm3_replyed
+    steps.dm2_replyed
+    steps.dm1_replyed
     steps.followed
   ], (step, callback) ->
     # 送信するメッセージ
@@ -75,13 +77,24 @@ main = () ->
     async.waterfall [
 
       # DMの取得
-      (callback) -> account.getDirectMessages callback
+      (callback) -> 
+        account.getDirectMessages callback
+        return
 
       # DMを送ってきたフォロワーの段階を１段階上げる
-      (direct_messages, callback) -> account.stepUpFollower(direct_messages, [steps.dm1_sent, steps.dm2_sent, steps.dm3_sent, steps.dm4_sent], callback)
+      (direct_messages, callback) -> 
+        account.stepUpFollower(direct_messages, 
+        [
+          steps.dm1_sent
+          steps.dm2_sent
+          steps.dm3_sent
+          # steps.dm4_sent
+        ], callback)
+        return
 
     ], (err, result) ->
       printLog err  if err
+      return
 
     # リフォローの検出
     async.waterfall [
