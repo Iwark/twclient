@@ -213,7 +213,7 @@
                   log.error("Send Error: " + err);
                   unfollowing_test = /who are not following/i.test(err);
                   if (unfollowing_test) {
-                    self.stepChangeFollower(follower.follower_id, 99);
+                    self.stepChangeFollower(follower.follower_id.toString(), 99);
                   }
                   suspended_test = /suspended/i.test(err);
                   exceeded_test = /lot to say/i.test(err);
