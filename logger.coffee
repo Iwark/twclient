@@ -2,7 +2,7 @@ nodemailer = require "nodemailer"
 fs = require "fs"
 
 # 処理の繰り返し間隔
-INTERVAL = 120 * 60 * 1000 # ２時間
+INTERVAL = 240 * 60 * 1000 # 4時間
 
 now = new Date()
 title = "TWclient Sever Log."
